@@ -59,6 +59,16 @@ func main() {
 	}
 
 	wg := sync.WaitGroup{}
+
+	// Add 1 noop event that runs until the end of the show
+	wg.Add(1)
+	endTimer := time.NewTimer(end.Sub(time.Now()))
+	go func() {
+		defer wg.Done()
+		<-endTimer.C
+		log.Printf("Fin.")
+	}()
+
 	wg.Add(len(schedule))
 	for i, e := range schedule {
 		wait := e.Time.Sub(time.Now())
