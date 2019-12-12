@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+enum House {
+    UNKNOWN_HOUSE = 0;
+    VICTORIA_STATION = 1;
+    TEA_SHOPPE = 2;
+    SPICE_MARKET = 3;
+    MARIONETTES = 4;
+    FELLOWSHIP_PORTERS = 5;
+    FEZZIWIG_WAREHOUSE = 6;
+    FEZZIWIG_WAREHOUSE_2 = 7;
+    CROOKED_FENCE_COTTAGE = 8;
+    BUTCHER = 9;
+    CUROSITY_SHOP = 10;
+}
+
+message Config {
+    map<uint32,House> house_pins = 1;
+}
+
+// ChangeLight changes the color / brightness of multucolor LEDs.
+message ChangeLight {
+    // The house to control.
+    House house = 1;
+
+    // The white amount for the house, 0 - 100.
+    uint32 white = 2;
+
+    // The red amount for the house, 0 - 100.
+    uint32 red = 3;
+}
