@@ -12,68 +12,95 @@ import (
 	cpb "github.com/bamnet/village/proto"
 )
 
-func main() {
-	/*
-		c := &cpb.Config{
-			HousePins: map[uint32]cpb.House{
-				1: cpb.House_BUTCHER,
-				2: cpb.House_CROOKED_FENCE_COTTAGE,
-				3: cpb.House_FEZZIWIG_WAREHOUSE_2,
-			},
-		}*/
-	c := &cpb.ChangeLight{
-		House: cpb.House_CUROSITY_SHOP,
-		Red:   5,
-		White: 5,
-	}
-	data, _ := proto.Marshal(c)
-	if _, err := sendCommand("village", "us-central1", "registry", "esp32-1", data); err != nil {
-		fmt.Printf("Error: %v", err)
-	}
-	fmt.Printf("%s", data)
-}
+const (
+	projectID  = "village"
+	region     = "us-central1"
+	registryID = "registry"
+	deviceID   = "esp32-1"
+)
 
-func sendCommand(projectID string, region string, registryID string, deviceID string, data []byte) (*cloudiot.SendCommandToDeviceResponse, error) {
-	// Authorize the client using Application Default Credentials.
-	// See https://g.co/dv/identity/protocols/application-default-credentials
+var ciot *cloudiot.Service
+var path string
+
+func init() {
 	ctx := context.Background()
 	httpClient, err := google.DefaultClient(ctx, cloudiot.CloudPlatformScope)
 	if err != nil {
-		return nil, err
+		fmt.Errorf("API Client error: %v", err)
 	}
-	client, err := cloudiot.New(httpClient)
+	ciot, err = cloudiot.New(httpClient)
 	if err != nil {
-		return nil, err
+		fmt.Errorf("cloudiot init error: %v", err)
 	}
 
-	/*
-		req := cloudiot.ModifyCloudToDeviceConfigRequest{
-			BinaryData: base64.StdEncoding.EncodeToString(data),
-		}
+	path = fmt.Sprintf("projects/%s/locations/%s/registries/%s/devices/%s", projectID, region, registryID, deviceID)
+}
 
-		name := fmt.Sprintf("projects/%s/locations/%s/registries/%s/devices/%s", projectID, region, registryID, deviceID)
+func updateConfig(c *cpb.Config) error {
+	data, err := proto.Marshal(c)
+	if err != nil {
+		return err
+	}
+	req := cloudiot.ModifyCloudToDeviceConfigRequest{
+		BinaryData: base64.StdEncoding.EncodeToString(data),
+	}
 
-		_, err = client.Projects.Locations.Registries.Devices.ModifyCloudToDeviceConfig(name, &req).Do()
-		if err != nil {
-			return nil, err
-		}
+	_, err = ciot.Projects.Locations.Registries.Devices.ModifyCloudToDeviceConfig(path, &req).Do()
+	return err
+}
 
-		return nil, nil
-	*/
+func changeAllLights(red, white int) {
+	for i := range cpb.House_name {
+		changeLight(cpb.House(i), red, white)
+	}
+}
+
+func changeLight(house cpb.House, red, white int) error {
+	command := &cpb.ChangeLight{
+		House: house,
+		Red:   uint32(red),
+		White: uint32(white),
+	}
+
+	data, err := proto.Marshal(command)
+	if err != nil {
+		return err
+	}
 
 	req := cloudiot.SendCommandToDeviceRequest{
 		BinaryData: base64.StdEncoding.EncodeToString(data),
 		Subfolder:  "changeLight",
 	}
 
-	name := fmt.Sprintf("projects/%s/locations/%s/registries/%s/devices/%s", projectID, region, registryID, deviceID)
+	_, err = ciot.Projects.Locations.Registries.Devices.SendCommandToDevice(path, &req).Do()
+	return err
+}
 
-	response, err := client.Projects.Locations.Registries.Devices.SendCommandToDevice(name, &req).Do()
-	if err != nil {
-		return nil, err
-	}
+func main() {
+	/*
+		config := &cpb.Config{
+			HousePins: map[uint32]cpb.House{
+				// Using pin 0 causes nanopb decoding problems.
+				2:  cpb.House_SPICE_MARKET,
+				4:  cpb.House_FELLOWSHIP_PORTERS,
+				6:  cpb.House_MARIONETTES,
+				8:  cpb.House_VICTORIA_STATION,
+				10: cpb.House_BUTCHER,
+				12: cpb.House_CUROSITY_SHOP,
+				14: cpb.House_FEZZIWIG_WAREHOUSE,
+				16: cpb.House_CROOKED_FENCE_COTTAGE,
+				18: cpb.House_FEZZIWIG_WAREHOUSE_2,
+				20: cpb.House_TEA_SHOPPE,
+			},
+		}
+		updateConfig(config)
+	*/
 
-	fmt.Println("Sent command to device")
+	changeAllLights(40, 40)
 
-	return response, nil
+	/*
+		changeLight(cpb.House_BUTCHER, 10, 10)
+		changeLight(cpb.House_SPICE_MARKET, 100, 100)
+		changeLight(cpb.House_VICTORIA_STATION, 50, 10)
+	*/
 }
