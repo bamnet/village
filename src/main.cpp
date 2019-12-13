@@ -24,7 +24,6 @@ uint16_t housePins[_House_ARRAYSIZE];
 Preferences preferences;
 
 void maybeSave(uint16_t pin, uint32_t pct){
-  preferences.putUInt("hello", 99);
   char buffer[10];
   sprintf(buffer, "pin %d", pin);
   preferences.putUInt(buffer, pct);
@@ -79,7 +78,7 @@ bool Config_decode_house_pins(pb_istream_t *stream, const pb_field_t *field, voi
   Config_HousePinsEntry hpe = Config_HousePinsEntry_init_zero;
   bool status = pb_decode(stream, Config_HousePinsEntry_fields, &hpe);
   if(!status) {
-    Serial.printf("Decoding failed: %s\n", PB_GET_ERROR(stream));
+    Serial.printf("Decoding field failed: %s\n", PB_GET_ERROR(stream));
     return status;
   }
 
