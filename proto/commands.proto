@@ -12,6 +12,7 @@ enum House {
     CROOKED_FENCE_COTTAGE = 8;
     BUTCHER = 9;
     CUROSITY_SHOP = 10;
+    BAKERY = 11;
 }
 
 message Config {
