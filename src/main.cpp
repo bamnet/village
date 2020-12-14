@@ -61,7 +61,7 @@ void loop() {
   }
 }
 
-bool string_to_proto(String &payload, const pb_field_t fields[], void *target) {
+bool string_to_proto(String &payload, const pb_msgdesc_t *fields, void *target) {
   const uint8_t *buffer = reinterpret_cast<const uint8_t*>(&payload[0]);
   size_t message_length = strlen(&payload[0]);
 
