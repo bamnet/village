@@ -1,11 +1,9 @@
 steps:
 - name: 'gcr.io/cloud-builders/go'
   id: 'amd64'
+  env: ['CGO_ENABLED=0', 'GOARCH=amd64']
   args:
   - 'build'
-  - '--build-arg=CGO_ENABLED=0'
-  - '--build-arg=GOARCH=amd64'
-  - '--tag=gcr.io/$PROJECT_ID/village:amd64'
   - './srv/main.go'
   waitFor: ['-']
 
@@ -18,11 +16,9 @@ steps:
 
 - name: 'gcr.io/cloud-builders/go'
   id: 'arm'
+  env: ['GOARCH=arm', 'GOARM=6']
   args:
   - 'build'
-  - '--build-arg=GOARCH=arm'
-  - '--build-arg=GOARM=6'
-  - '--tag=gcr.io/$PROJECT_ID/village:arm32v6'
   - './srv/main.go'
   waitFor: ['-']
 
