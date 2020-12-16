@@ -1,6 +1,6 @@
 FROM golang:alpine as builder
 
-RUN apk update && apk add git && apk add tzdata
+RUN apk update && apk add git && apk add tzdata && apt add ca-certificates
 
 COPY . $GOPATH/src/github.com/bamnet/village
 WORKDIR $GOPATH/src/github.com/bamnet/village
@@ -12,6 +12,7 @@ RUN env CGO_ENABLED=${CGO_ENABLED} GOARCH=${GOARCH} GOARM=${GOARM} go build -o /
 
 FROM scratch
 COPY --from=builder /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/show /go/bin/show
 ENTRYPOINT ["/go/bin/show"]
 CMD []
