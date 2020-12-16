@@ -1,0 +1,2 @@
+protoc -I=proto/ --go_out=proto proto/commands.proto
+~/Downloads/nanopb-0.4.4-linux-x86/generator-bin/nanopb_generator -I=../../proto/ ../../proto/commands.proto

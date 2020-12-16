@@ -67,7 +67,3 @@ steps:
   - 'push'
   - 'gcr.io/$PROJECT_ID/village:$COMMIT_SHA'
   waitFor: ['annotate-manifest']
-
-images:
-  - 'gcr.io/$PROJECT_ID/village:amd64'
-  - 'gcr.io/$PROJECT_ID/village:arm32v6'
