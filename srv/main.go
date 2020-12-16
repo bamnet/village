@@ -40,7 +40,10 @@ func main() {
 		log.Fatalf("Error loading timezone data: %v", err)
 	}
 
-	client, _ := village.New(*projectID, *iotRegion, *registryID, *deviceID)
+	client, err := village.New(*projectID, *iotRegion, *registryID, *deviceID)
+	if err != nil {
+		log.Fatalf("Error setting up village client: %v", err)
+	}
 
 	/*
 		if err := client.UpdateConfig(&cpb.Config{
