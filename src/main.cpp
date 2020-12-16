@@ -19,7 +19,9 @@
 
 Adafruit_TLC5947 tlc = Adafruit_TLC5947(NUM_TLC5974, CLOCK_PIN, DATA_PIN, LATCH_PIN);
 
-uint16_t housePins[_House_ARRAYSIZE];
+// I couldn't get the config to work so we hardcode it.
+// Sorry future self.
+uint16_t housePins[_House_ARRAYSIZE] = {0, 0, 10, 14, 2, 18, 6, 8, 20, 12, 16, 4};
 
 Preferences preferences;
 
@@ -91,7 +93,7 @@ void messageReceived(String &topic, String &payload) {
   
   if (topic.endsWith("/config")) {
     printf("Recieved config message");
-
+    /* 
     // Since the default array value is 0, and 0 is a valid pin
     // we use a different default and manually inject it.
     for(int i = 1; i<(sizeof(housePins)/sizeof(uint16_t)); i++){
@@ -105,6 +107,7 @@ void messageReceived(String &topic, String &payload) {
     if (!status) {
       return;
     }
+    */
 
     for(int i = 1; i<(sizeof(housePins)/sizeof(uint16_t)); i++){
       Serial.printf("House %d @ pin %d\n", i, housePins[i]);
