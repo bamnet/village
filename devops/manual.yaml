@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: village
+  labels:
+    app: village
+spec:
+  selector:
+    matchLabels:
+      app: village
+  template:
+    metadata:
+      labels:
+        app: village
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: village-key
+      containers:
+      - name: village
+        image: gcr.io/village/village
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
