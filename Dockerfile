@@ -1,6 +1,6 @@
 FROM golang:alpine as builder
 
-RUN apk update && apk add git && apk add tzdata && apt add ca-certificates
+RUN apk update && apk add git && apk add tzdata && apk add ca-certificates
 
 COPY . $GOPATH/src/github.com/bamnet/village
 WORKDIR $GOPATH/src/github.com/bamnet/village
