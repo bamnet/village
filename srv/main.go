@@ -42,6 +42,28 @@ func main() {
 
 	client, _ := village.New(*projectID, *iotRegion, *registryID, *deviceID)
 
+	/*
+		if err := client.UpdateConfig(&cpb.Config{
+			HousePins: map[uint32]cpb.House{
+				0: cpb.House_VICTORIA_STATION,
+				/*2:  cpb.House_MARIONETTES,
+				4:  cpb.House_BAKERY,
+				6:  cpb.House_FEZZIWIG_WAREHOUSE,
+				8:  cpb.House_FEZZIWIG_WAREHOUSE_2,
+				10: cpb.House_TEA_SHOPPE,
+				12: cpb.House_BUTCHER,
+				14: cpb.House_CUROSITY_SHOP,
+				16: cpb.House_SPICE_MARKET,
+				18: cpb.House_FELLOWSHIP_PORTERS,
+				20: cpb.House_CROOKED_FENCE_COTTAGE,
+			},
+		}); err != nil {
+			log.Fatalf("Error updating config: %v", err)
+		}
+	*/
+	// client.ChangeAllLights(0, 0)
+	//client.ChangeLight(cpb.House_VICTORIA_STATION, 100, 100)
+
 	now := time.Now().In(nyc)
 	start := time.Date(now.Year(), now.Month(), now.Day(), *startHour, 0, 0, 0, nyc)
 	end := start.Add(time.Duration(*length) * time.Hour)
