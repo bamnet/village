@@ -1,0 +1,69 @@
+steps:
+- name: 'gcr.io/cloud-builders/go'
+  id: 'amd64'
+  args:
+  - 'build'
+  - '--build-arg=CGO_ENABLED=0'
+  - '--build-arg=GOARCH=amd64'
+  - '--tag=gcr.io/$PROJECT_ID/village:amd64'
+  - './srv/main.go'
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-amd64'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/village:amd64'
+  waitFor: ['amd64']
+
+- name: 'gcr.io/cloud-builders/go'
+  id: 'arm'
+  args:
+  - 'build'
+  - '--build-arg=GOARCH=arm'
+  - '--build-arg=GOARM=6'
+  - '--tag=gcr.io/$PROJECT_ID/village:arm32v6'
+  - './srv/main.go'
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-arm'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/village:arm32v6'
+  waitFor: ['arm']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'manifest'
+  env:
+  - 'DOCKER_CLI_EXPERIMENTAL=enabled'
+  args:
+  - 'manifest'
+  - 'create'
+  - 'gcr.io/$PROJECT_ID/village:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/village:arm32v6'
+  - 'gcr.io/$PROJECT_ID/village:amd64' 
+  waitFor: ['push-amd64', 'push-arm']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'annotate-manifest'
+  env:
+  - 'DOCKER_CLI_EXPERIMENTAL=enabled'
+  args:
+  - 'manifest'
+  - 'annotate'
+  - 'gcr.io/$PROJECT_ID/village:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/village:arm32v6'
+  - '--os=linux'
+  - '--arch=arm'
+  waitFor: ['manifest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-manifest'
+  env:
+  - 'DOCKER_CLI_EXPERIMENTAL=enabled'
+  args:
+  - 'manifest'
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/village:$COMMIT_SHA'
+  waitFor: ['annotate-manifest']
