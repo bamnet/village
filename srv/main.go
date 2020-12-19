@@ -134,13 +134,13 @@ func planSchedule(house cpb.House, start, end time.Time) []Event {
 
 	// Everything turns off in the last 2 hours.
 	off := end.Add(-1 * time.Duration(rand.Intn(120)) * time.Minute)
-	events[len(events)-1] = Event{house, 1, off}
+	events[len(events)-1] = Event{house, 0, off}
 
 	// Generate random events to fill in the rest of the gaps.
 	for i := 1; i < len(events)-1; i++ {
 		gap := int(off.Sub(on).Minutes())
 		t := start.Add(time.Duration(rand.Intn(gap)) * time.Minute)
-		b := 5 + rand.Intn(70)
+		b := rand.Intn(70)
 		events[i] = Event{house, b, t}
 	}
 
