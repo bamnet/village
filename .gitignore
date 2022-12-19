@@ -1,0 +1,5 @@
+# ESP-IDF default build directory
+build
+
+# managed_components for examples
+managed_components
