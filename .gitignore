@@ -3,3 +3,6 @@ build
 
 # managed_components for examples
 managed_components
+
+# Local sdkconfig. Edit sdkconfig.defaults instead.
+sdkconfig
