@@ -99,10 +99,21 @@ We obviously want to modernize this with an LED.
 - Each channel drives 3 LEDs in series, and all 3 LEDs show the same color, with one
   address per house. The white channel MUST be warm white (2700 - 3000 K).
 - LEDs SHOULD be 3 RGBW 5050 4-in-1 packages with a warm-white die, matching 2018.
-  **TBD:** find a JLCPCB-assemblable part. As of 2026-09, the only 4-in-1 RGBW 5050
-  found on LCSC (XINGLIGHT XL-5050RGBW, C7371891) is cool white (6000 - 6500 K).
   Fallback: 3 RGB LEDs plus 3 separate warm-white LEDs, which also allows a free
   choice of warm-white LED.
+- As of 2026-09, LCSC has two warm-white 4-in-1 RGBW 5050 parts (SMD5050-8P, with
+  a separate anode and cathode pin per color). Both are JLCPCB extended parts.
+  Figures are from the datasheets, at 20 mA:
+  - Honglitronic HL-5050RGBW-S1-A27 (C22470444): about 11,000 in JLCPCB stock.
+    The "-A27" suffix is the datasheet's white bin A27, which is 2580 - 2870 K.
+    That is slightly warmer than 2700 - 3000 K at the low end. White gives 7 - 9 lm,
+    CRI 80 or better. Forward voltage is 2.8 - 3.4 V (W/G/B) and 1.8 - 2.4 V (R).
+  - TCWIN TC5050RGBW3D06-4CSAR3-AFW324A (C784543): 2800 - 3200 K. White gives
+    6 - 7 lm, CRI 80 - 85, with a forward voltage of 2.8 - 3.2 V. Stock is low
+    (about 240 at JLCPCB, 860 at LCSC).
+  - Cool-white variants that do not meet the spec: XINGLIGHT XL-5050RGBW
+    (C7371891), TCWIN C784545 (6000 - 6500 K), and C784544 (3800 - 4200 K).
+  **TBD:** choose between them. The Honglitronic part is preferred.
 - Heat is not expected to be a concern. The cut-up LED strip prototype ran without
   heat problems.
 
@@ -145,8 +156,8 @@ first-class requirement here.
   0.4 A.
 - Estimated voltage drop: about 0.6 V at full RGBW for a 6-house chain on 26 AWG
   cable (about 2 m to the first house, then 1 m hops). This is within the headroom.
-- **TBD:** the power input connector, and a supply sized with margin (for example
-  12 V, 3 A or more).
+- For the prototype, power enters through the Dig-Quad's input screw terminals.
+  **TBD:** a supply sized with margin (for example 12 V, 3 A or more).
 
 ### Pixel PCB
 
@@ -171,13 +182,26 @@ first-class requirement here.
   LED part is chosen.
 - Through-hole header pins and solder joints come out on the LED side. Headers
   MUST sit near the rim, with a centered keep-out for the LEDs.
-- **TBD:** whether the headers are vertical (pointing down into the holder) or
-  right-angle.
+- Headers SHOULD be right-angle, mounted side by side on the bottom, with both
+  pointing the same way (toward the cord notch). The plugs then lie flat under the
+  board. This gives a much lower profile than vertical headers, and both cables
+  already point where they need to go. JLCPCB-assemblable candidates: male C492411
+  and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
+  back to vertical headers. **TBD:** confirm the fit with real servo plugs (the
+  width is estimated at about 8 mm each).
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
 ### Base station
 
+- For prototyping, we will buy an off-the-shelf WLED controller instead of designing
+  one, so the effort goes into the Pixel PCB. A custom base station is deferred. The
+  requirements below still apply to whatever we use. The prototype controller is the
+  QuinLED Dig-Quad (pre-assembled): 4 level-shifted outputs, 12 V capable, and a
+  plug-in fuse per pair of outputs, which should be sized to protect the servo cables.
+- For the prototype, each chain connects to the Dig-Quad's screw terminals using a
+  servo extension cable cut in half, with the ends stripped. This is an accepted
+  exception to the no-built-cables rule, since it needs no soldering or crimping.
 - The base station does not have any sizing constraints.
 - It MUST be compatible with [WLED](https://kno.wled.ge/) (ESP32-based), so we can get
   started quickly. Custom firmware is a future goal and is out of scope for now.
