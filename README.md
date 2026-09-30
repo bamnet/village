@@ -293,8 +293,17 @@ first-class requirement here.
   - Pin order: the stock footprints put J1's pin 1 at the west end and J2's pin 1
     at the east end, so the two GND pins are adjacent. Neither part is polarized,
     so this only decides which way up each cable plugs in.
-    **TBD:** consider a bottom silkscreen mark at each pin 1 (data) so plugs go in
-    the right way.
+  - Silkscreen markings for plugging in and for JLCPCB's assembly review:
+    - Bottom: a filled triangle points at each header's pin 1 (data), with "+" and
+      "-" at the other pins. These shapes read the same whether or not they are
+      mirrored.
+    - Bottom: "JLCJLCJLCJLC" marks where JLCPCB should print its order number.
+      When ordering, choose "Specify a location" for the order number. Otherwise
+      it could land among the LEDs.
+    - Top: "v0.1", and a pin-1 dot inside U1's outline. The footprint's pin-1
+      silkscreen line is clipped by J1's GND pad, so without the dot the top and
+      bottom lines would look alike.
+    - The LEDs keep their pin-1 tick. D1 uses KiCad's stock SOT-23 outline.
   - On the top side, the LEDs follow the chain +12V -> D2 (east, rot 90) -> D3
     (south, rot 0) -> D4 (west, rot 270) -> U1. Each LED faces the side that
     connects to the next LED toward it, so each group of four color nets between

@@ -3271,6 +3271,95 @@
 			)
 		)
 	)
+	(gr_poly
+		(pts
+			(xy 99.267624 97.27) (xy 99.301227 97.284022) (xy 99.315249 97.317624) (xy 99.301227 97.351227) (xy 99.267624 97.365249)
+			(xy 99.234022 97.351227) (xy 99.22 97.317624) (xy 99.234022 97.284022)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "8383070f-585b-40e3-b767-5c28c19ef614")
+	)
+	(gr_poly
+		(pts
+			(xy 92.71 94.3) (xy 92.921666 94.3) (xy 92.815833 94.471979)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "26fd2407-7771-408e-808f-0f2c44a63bce")
+	)
+	(gr_poly
+		(pts
+			(xy 106.68 94.3) (xy 106.891666 94.3) (xy 106.785833 94.471979)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "e6e31701-4fda-43c1-9d45-a824f38ec801")
+	)
+	(gr_poly
+		(pts
+			(xy 97.79 94.26) (xy 98.001666 94.26) (xy 98.001666 94.307624) (xy 97.79 94.307624)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "03416365-dda2-4b70-94c5-74135ee59068")
+	)
+	(gr_poly
+		(pts
+			(xy 101.6 94.26) (xy 101.811666 94.26) (xy 101.811666 94.307624) (xy 101.6 94.307624)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "bb2249ab-f1ea-4218-9e98-14bcbba37a22")
+	)
+	(gr_poly
+		(pts
+			(xy 95.33202 93.95) (xy 95.379645 93.95) (xy 95.379645 94.03202) (xy 95.461666 94.03202) (xy 95.461666 94.079645)
+			(xy 95.379645 94.079645) (xy 95.379645 94.161666) (xy 95.33202 94.161666) (xy 95.33202 94.079645)
+			(xy 95.25 94.079645) (xy 95.25 94.03202) (xy 95.33202 94.03202)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "5d4e3cf6-2aac-4a99-8cb8-523f8eb90e7d")
+	)
+	(gr_poly
+		(pts
+			(xy 104.22202 93.95) (xy 104.269645 93.95) (xy 104.269645 94.03202) (xy 104.351666 94.03202) (xy 104.351666 94.079645)
+			(xy 104.269645 94.079645) (xy 104.269645 94.161666) (xy 104.22202 94.161666) (xy 104.22202 94.079645)
+			(xy 104.14 94.079645) (xy 104.14 94.03202) (xy 104.22202 94.03202)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "B.SilkS")
+		(uuid "edd5cafa-40a8-464c-b0a4-e5165edc8f8e")
+	)
 	(gr_arc
 		(start 90 100)
 		(mid 92.928932 92.928932)
@@ -3314,6 +3403,28 @@
 		)
 		(layer "Edge.Cuts")
 		(uuid "f7e60cec-c65d-4565-815c-6d18d9a076b6")
+	)
+	(gr_text "v0.1"
+		(at 105.4 105.9 0)
+		(layer "F.SilkS")
+		(uuid "2d5438d7-dec4-49d7-8d3c-acb9ec905b2a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(gr_text "JLCJLCJLCJLC"
+		(at 100 107.4 0)
+		(layer "B.SilkS")
+		(uuid "441e51cf-c576-4021-8d9e-5f63e520d35b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
 	)
 	(segment
 		(start 97.41 97.4)
