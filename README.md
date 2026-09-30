@@ -101,8 +101,14 @@ We obviously want to modernize this with an LED.
   It has the same 16.5 mA outputs, the same 9 V DIN rating, and the same 12 V
   application circuit (2.7k to VDD, 0.1 uF). It has no backup data input (DIN2),
   so there is nothing to tie off. Its data order is W, R, G, B (datasheet p. 4).
-  The WS2814A (SOP-8, C2920044, about 7,800 in stock) has the same pinout. It is a
-  fallback with a standard SOIC-8 footprint. **TBD:** confirm the WS2814F.
+  The WS2814A (SOP-8, C2920044, about 7,800 in stock) is the same die in a larger
+  package. It is the fallback, with a standard SOIC-8 footprint.
+- Decided (2026-09-30): the Pixel PCB uses the WS2814F. Its smaller body leaves
+  more room for the LEDs on the 20 mm board.
+- The WS2814F's FSOP-8 footprint (2.85 x 3.25 mm body, 0.8 mm pitch) is not in
+  KiCad's stock libraries, so we will draw it. Once it's proven on a fabricated
+  board, consider contributing it (and a WS2814 symbol) upstream to the KiCad
+  libraries.
 - Each channel drives 3 LEDs in series, and all 3 LEDs show the same color, with one
   address per house. The white channel MUST be warm white (2700 - 3000 K).
 - LEDs SHOULD be 3 RGBW 5050 4-in-1 packages with a warm-white die, matching 2018.
