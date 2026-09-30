@@ -266,19 +266,25 @@ first-class requirement here.
 - Provisional placement (fit study, not routed): `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
     (+Y) edge.
-  - J1 and J2 are on the bottom side, with pin rows side by side along the south
-    rim and bodies pointing south, overhanging the rim toward the notch.
-  - The header rows are 8.7 mm apart, center to center. That is the minimum
-    for KiCad's stock footprints, whose courtyards are 8.62 mm wide, so it is
-    slightly more than the estimated 8 mm plug width.
+  - J1 and J2 are on the bottom side, with pin rows side by side about 4 mm north
+    of center. Their bodies point south and run under the board, so the plugs
+    mate near the south rim and lie flat. This works because the headers and
+    plugs are on the bottom while every other part is on the top, so the header
+    bodies can sit under the top-side parts.
+  - This relaxes "headers near the rim". The pin rows sit just north of the
+    LEDs, and the LED cluster sits about 2.5 mm south of center.
+  - The header rows are 8.9 mm apart, center to center. KiCad's stock
+    footprints need at least 8.62 mm, which is slightly more than the estimated
+    8 mm plug width.
   - The stock right-angle footprints give mirrored pin orders: J1's pin 1 is at
     the west end and J2's pin 1 at the east end, so the two GND pins are adjacent.
     The real LCSC parts (C492411, C2897385) may differ. Check their drawings.
-  - On the top side, D2-D4 form a triangle at the center. U1 and C1 are at the
-    upper left, R1 and C2 along the top, D1 at the upper right, R2 on the left,
-    and R3 and R4 on the right.
-  - Everything fits with no courtyard overlaps. The only DRC errors are the
-    unrouted connections.
+  - On the top side, D2-D4 form an inverted triangle (D4 west, D3 east, D2
+    south), with 0.5 - 1 mm between LED bodies. U1 is in the middle, with C1
+    beside its VDD pin, and R3 and R4 just below it. D1, R1, C2 and R2 sit
+    above the header pin rows.
+  - Everything fits: the placement score is 100 with no courtyard overlaps, and
+    the only DRC errors are the unrouted connections.
   - **TBD:** revisit the header positions once real plugs are measured.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
