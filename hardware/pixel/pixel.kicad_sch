@@ -1699,7 +1699,7 @@
 			(at 53.34 100.33 0)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Footprint" ""
+		(property "Footprint" "village:FSOP-8_1.65x3.25mm_P0.8mm"
 			(at 53.34 91.44 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
@@ -2190,7 +2190,7 @@
 			(at 45.72 147.32 0)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Footprint" ""
+		(property "Footprint" "village:LED_Honglitronic_HL-5050RGBW_5.0x5.0mm_P1.2mm"
 			(at 45.72 139.7 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
@@ -2472,7 +2472,7 @@
 			(at 91.44 147.32 0)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Footprint" ""
+		(property "Footprint" "village:LED_Honglitronic_HL-5050RGBW_5.0x5.0mm_P1.2mm"
 			(at 91.44 139.7 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
@@ -2626,7 +2626,7 @@
 			(at 137.16 147.32 0)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Footprint" ""
+		(property "Footprint" "village:LED_Honglitronic_HL-5050RGBW_5.0x5.0mm_P1.2mm"
 			(at 137.16 139.7 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)

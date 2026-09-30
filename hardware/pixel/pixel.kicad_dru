@@ -1,0 +1,24 @@
+(version 1)
+
+# JLCPCB 2-layer limits, checked 2026-09-30 against
+# https://jlcpcb.com/capabilities/pcb-capabilities and
+# https://jlcpcb.com/blog/design-rule-check.
+# Clearance (0.2 mm netclass), copper-to-edge (0.5 mm), hole-to-hole (0.25 mm)
+# and minimum drill (0.3 mm) are set in Board Setup and already meet JLCPCB's
+# limits, so they are not repeated here.
+
+# JLCPCB's standard via (0.3 mm drill, 0.6 mm pad) leaves a 0.15 mm ring.
+(rule "JLCPCB via annular ring"
+    (condition "A.Type == 'Via'")
+    (constraint annular_width (min 0.15mm)))
+
+# Plated component holes: 0.18 mm minimum, 0.25 mm recommended.
+(rule "JLCPCB PTH pad annular ring"
+    (condition "A.Type == 'Pad' && A.isPlated()")
+    (constraint annular_width (min 0.18mm)))
+
+# Silkscreen text: at least 1.0 mm tall with 0.15 mm strokes.
+(rule "JLCPCB silkscreen text"
+    (layer "?.Silkscreen")
+    (constraint text_height (min 1.0mm))
+    (constraint text_thickness (min 0.15mm)))

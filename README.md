@@ -105,8 +105,8 @@ We obviously want to modernize this with an LED.
   package. It is the fallback, with a standard SOIC-8 footprint.
 - Decided (2026-09-30): the Pixel PCB uses the WS2814F. Its smaller body leaves
   more room for the LEDs on the 20 mm board.
-- The WS2814F's FSOP-8 footprint (2.85 x 3.25 mm body, 0.8 mm pitch) is not in
-  KiCad's stock libraries, so we will draw it. Once it's proven on a fabricated
+- The WS2814F's FSOP-8 footprint (1.65 x 3.25 mm body, 2.85 mm lead span, 0.8 mm
+  pitch) is not in KiCad's stock libraries, so we drew it. Once it's proven on a fabricated
   board, consider contributing it (and a WS2814 symbol) upstream to the KiCad
   libraries.
 - Each channel drives 3 LEDs in series, and all 3 LEDs show the same color, with one
@@ -217,9 +217,24 @@ first-class requirement here.
 - The project targets KiCad 10. Files saved in KiCad 10 cannot be opened in
   KiCad 9.
 - Draft schematic: `hardware/pixel/pixel.kicad_sch` (v0.1). It was authored in
-  KiCad 9 format and is ERC clean in KiCad 9.0.2 and 10.0.6. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
-  5050 LED are not in KiCad's stock libraries, so those two fields are blank.
-  **TBD:** create them during layout.
+  KiCad 9 format and is ERC clean in KiCad 9.0.2 and 10.0.6.
+- Custom footprints live in the project library `hardware/pixel/village.pretty`
+  (nickname `village`), since neither part is in KiCad's stock libraries:
+  - `FSOP-8_1.65x3.25mm_P0.8mm` (U1, WS2814F). From the datasheet package drawing
+    (V1.1, p. 6): 0.35 mm leads with 0.4 mm feet. The land pattern is 0.9 x 0.45 mm
+    pads centered 2.6 mm apart (0.3 mm toe, 0.2 mm heel).
+  - `LED_Honglitronic_HL-5050RGBW_5.0x5.0mm_P1.2mm` (D2-D4). This is the
+    manufacturer's recommended land pattern (spec B-18-A-1651 rev A/2, p. 3):
+    1.1 x 0.54 mm pads, 2.83 mm inner gap, 1.2 mm pitch. Pads are numbered as in the
+    datasheet's top view: anodes 1/3/5/7 on the right, cathodes 2/4/6/8 on the
+    left, pin 1 at the top right. The part's corner mark sits at pin 2.
+  - **TBD:** the LED datasheet's "bottom view" labels the pins the same as its top
+    view, not mirrored, so one of the two views is wrong. A mirrored footprint
+    would put every LED in backwards. Before ordering boards, check a sample with
+    a multimeter in diode mode: with the corner mark at the top left, looking at
+    the lens, the top-right lead should be the white anode (+).
+  - **TBD:** both are unproven until a fabricated board is assembled and works.
+    The TCWIN LED would need its own footprint, because its pad numbering differs.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
@@ -248,6 +263,56 @@ first-class requirement here.
   and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
   back to vertical headers. **TBD:** confirm the fit with real servo plugs (the
   width is estimated at about 8 mm each).
+- Provisional layout (placed and routed, pending real plug dimensions):
+  `hardware/pixel/pixel.kicad_pcb`.
+  - The board is a 20 mm circle. The cord notch is taken to be at the south
+    (+Y) edge.
+  - J1 and J2 are on the bottom side, with pin rows side by side about 4 mm north
+    of center. Their bodies point south and run under the board, so the plugs
+    mate near the south rim and lie flat. This works because the headers and
+    plugs are on the bottom while every other part is on the top, so the header
+    bodies can sit under the top-side parts.
+  - This relaxes "headers near the rim". The pin rows sit just north of the
+    LEDs, and the LED cluster sits about 2.5 mm south of center.
+  - The header rows are 8.9 mm apart, center to center. KiCad's stock
+    footprints need at least 8.62 mm, which is slightly more than the estimated
+    8 mm plug width.
+  - J1 and J2 use KiCad's stock right-angle footprints. Checked against the LCSC
+    drawings on 2026-09-30, and the copper matches:
+    - J1, male (XFCN PZ254R-11-03P, C492411): Ø1.02 mm holes and 0.64 mm square
+      pins (0.91 mm across the corners, so they fit the 1.0 mm drill). The
+      body's front face is 4.4 mm from the pin row, and the pin tips are at
+      10.4 mm (KiCad draws 4.04 mm and 10.04 mm).
+    - J2, female (HCTL PM254-1-03-W-8.5, C2897385): Ø1.02 mm holes. The 8.5 mm
+      body ends 10.2 mm from the pin row (KiCad draws 10.03 mm), and the body is
+      8.02 mm wide (KiCad draws 7.62 mm).
+    - KiCad's courtyards still cover both real bodies. With the rows 8.9 mm apart,
+      the bodies are about 1.1 mm apart.
+    - The pin tails are 3.0 and 3.2 mm long, so on a 1.6 mm board they stick up
+      about 1.4 - 1.6 mm on the LED side.
+  - Pin order: the stock footprints put J1's pin 1 at the west end and J2's pin 1
+    at the east end, so the two GND pins are adjacent. Neither part is polarized,
+    so this only decides which way up each cable plugs in.
+    **TBD:** consider a bottom silkscreen mark at each pin 1 (data) so plugs go in
+    the right way.
+  - On the top side, the LEDs follow the chain +12V -> D2 (east, rot 90) -> D3
+    (south, rot 0) -> D4 (west, rot 270) -> U1. Each LED faces the side that
+    connects to the next LED toward it, so each group of four color nets between
+    LEDs fans diagonally with no crossings. D4's R/G/B cathodes sit just below
+    U1's matching outputs. U1 is between D4 and D2, with R4 on the red output and
+    C1 beside the VDD pin. D1, R1, C2 and R2 sit above the header pin rows.
+  - Routed with Freerouting 2.4.1: 4 vias. +12V and GND are 0.4 mm (a Power
+    netclass), because up to ~0.4 A passes through to the rest of the chain.
+    Signals are 0.2 mm. VDD narrows to 0.15 mm around U1, and the board minimum
+    is set to 0.15 mm to allow it.
+  - DRC: 0 errors, 0 unconnected. JLCPCB's limits are enforced by
+    `pixel.kicad_dru` and the board setup.
+  - Routing workflow: export the DSN with KiCad's Python module
+    (`pcbnew.ExportSpecctraDSN`). Route with Freerouting's bundled launcher,
+    because the standalone jar needs Java 25. Import the session in KiCad with
+    File -> Import -> Specctra Session. Konnect's own DSN export refuses this
+    board (round outline, back-side headers, custom rules).
+  - **TBD:** revisit the header positions once real plugs are measured.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
