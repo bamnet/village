@@ -189,10 +189,10 @@ first-class requirement here.
 
 ### Pixel PCB
 
-- Draft schematic: `hardware/pixel/pixel.kicad_sch` (KiCad 9, v0.1). It was
-  written by a script without KiCad installed, so open it in KiCad and run ERC
-  before layout. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
-  5050 LED are not in KiCad's stock libraries. **TBD:** create them during layout.
+- Draft schematic: `hardware/pixel/pixel.kicad_sch` (KiCad 9, v0.1). ERC is clean
+  in KiCad 9.0.2. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
+  5050 LED are not in KiCad's stock libraries, so those two fields are blank.
+  **TBD:** create them during layout.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
