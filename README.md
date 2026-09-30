@@ -263,6 +263,23 @@ first-class requirement here.
   and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
   back to vertical headers. **TBD:** confirm the fit with real servo plugs (the
   width is estimated at about 8 mm each).
+- Provisional placement (fit study, not routed): `hardware/pixel/pixel.kicad_pcb`.
+  - The board is a 20 mm circle. The cord notch is taken to be at the south
+    (+Y) edge.
+  - J1 and J2 are on the bottom side, with pin rows side by side along the south
+    rim and bodies pointing south, overhanging the rim toward the notch.
+  - The header rows are 8.7 mm apart, center to center. That is the minimum
+    for KiCad's stock footprints, whose courtyards are 8.62 mm wide, so it is
+    slightly more than the estimated 8 mm plug width.
+  - The stock right-angle footprints give mirrored pin orders: J1's pin 1 is at
+    the west end and J2's pin 1 at the east end, so the two GND pins are adjacent.
+    The real LCSC parts (C492411, C2897385) may differ. Check their drawings.
+  - On the top side, D2-D4 form a triangle at the center. U1 and C1 are at the
+    upper left, R1 and C2 along the top, D1 at the upper right, R2 on the left,
+    and R3 and R4 on the right.
+  - Everything fits with no courtyard overlaps. The only DRC errors are the
+    unrouted connections.
+  - **TBD:** revisit the header positions once real plugs are measured.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
