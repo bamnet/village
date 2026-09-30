@@ -976,6 +976,11 @@
 			(embedded_fonts no)
 		)
 	)
+  (text "Pixel PCB (one per house). 12 V, WS2814F driver, 3 x RGBW 5050 LEDs, 3 per channel in series.\nChain in on J1 (male), out on J2 (female). Servo pinout: 1 = data, 2 = +12 V, 3 = GND.\nReversed plug: GND and data swap. This house's ground (and everything downstream) returns mostly\nthrough the upstream R3/DOUT (DOUT sink rated 10 mA min at 0.4 V). D1 clamps our DIN within the rails,\nand R2 limits the current through D1.\nOffset plug (one pin over): 12 V can land on DATA_IN. R2 limits the current into VDD through D1\n(~7 mA); VDD must stay under its 5.3 V absolute max.\nR4 moves ~2 V of the red channel's excess headroom off the WS2814 (red Vf 1.8-2.4 V x3).\nWS2814F data order is W,R,G,B (datasheet p.4); set the color order in WLED to match.\nFootprints for U1 and D2-D4 are in the project library village.pretty (see README).\nTBD: R2 value, R4 value. Fab-board tests: reversed plug\n(upstream DOUT / Dig-Quad output survive), offset plug (VDD <= 5.3 V)."
+    (at 25.4 160.02 0)
+    (effects (font (size 1.27 1.27)) (justify left top))
+    (uuid "36047d4e-f36f-4a66-bb17-d7a448f881be")
+  )
 	(symbol
 		(lib_id "Connector:Conn_01x03_Pin")
 		(at 25.4 50.8 0)
@@ -2967,12 +2972,6 @@
 		(at 167.64 45.72 270)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "2cbc2f4d-d8f3-573a-b357-4191e93fb6e9")
-	)
-	(text "Pixel PCB (one per house). 12 V, WS2814F driver, 3 x RGBW 5050 LEDs, 3 per channel in series.\nChain in on J1 (male), out on J2 (female). Servo pinout: 1 = data, 2 = +12 V, 3 = GND.\nReversed plug: GND and data swap. This house's ground (and everything downstream) returns mostly\nthrough the upstream R3/DOUT (DOUT sink rated 10 mA min at 0.4 V). D1 clamps our DIN within the rails,\nand R2 limits the current through D1.\nOffset plug (one pin over): 12 V can land on DATA_IN. R2 limits the current into VDD through D1\n(~7 mA); VDD must stay under its 5.3 V absolute max.\nR4 moves ~2 V of the red channel's excess headroom off the WS2814 (red Vf 1.8-2.4 V x3).\nWS2814F data order is W,R,G,B (datasheet p.4); set the color order in WLED to match.\nTBD: R2 value, R4 value, custom footprints for U1 and D2-D4. Fab-board tests: reversed plug\n(upstream DOUT / Dig-Quad output survive), offset plug (VDD <= 5.3 V)."
-		(exclude_from_sim no)
-		(at 25.4 160.02 0)
-		(effects (font (size 1.27 1.27)) (justify left top))
-		(uuid "c1520f0d-422a-59d6-a31d-1d89dec1df87")
 	)
 	(sheet_instances
 		(path "/"
