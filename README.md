@@ -92,10 +92,17 @@ We obviously want to modernize this with an LED.
   in series at about 20 mA.
 - Brightness target: warm-white output per house SHOULD match the 2018 segment,
   meaning 3 warm-white RGBW 5050 LEDs driven at about 16 - 20 mA.
-- Each house MUST use one WS2814 as its driver (Worldsemi, SOP-12, JLCPCB/LCSC
-  C965562). It is a 4-channel RGBW constant-current driver that WLED supports
-  (configured as SK6812 RGBW type). Its outputs are fixed at 16.5 mA per channel,
-  about 80% of the 2018 current. **TBD:** confirm this is bright enough.
+- Each house MUST use one WS2814 as its driver. It is a 4-channel RGBW
+  constant-current driver that WLED supports (configured as SK6812 RGBW type). Its
+  outputs are fixed at 16.5 mA per channel, about 80% of the 2018 current.
+  **TBD:** confirm this is bright enough.
+- As of 2026-09-30, the original SOP-12 WS2814 (C965562) shows 0 stock at LCSC.
+  The draft schematic uses the WS2814F (FSOP-8, C5446694, about 107,000 in stock).
+  It has the same 16.5 mA outputs, the same 9 V DIN rating, and the same 12 V
+  application circuit (2.7k to VDD, 0.1 uF). It has no backup data input (DIN2),
+  so there is nothing to tie off. Its data order is W, R, G, B (datasheet p. 4).
+  The WS2814A (SOP-8, C2920044, about 7,800 in stock) has the same pinout. It is a
+  fallback with a standard SOIC-8 footprint. **TBD:** confirm the WS2814F.
 - Each channel drives 3 LEDs in series, and all 3 LEDs show the same color, with one
   address per house. The white channel MUST be warm white (2700 - 3000 K).
 - LEDs SHOULD be 3 RGBW 5050 4-in-1 packages with a warm-white die, matching 2018.
@@ -116,6 +123,14 @@ We obviously want to modernize this with an LED.
   **TBD:** choose between them. The Honglitronic part is preferred.
 - Heat is not expected to be a concern. The cut-up LED strip prototype ran without
   heat problems.
+- Driver heat (estimated): 3 red LEDs drop only 5.4 - 7.2 V, which leaves up to
+  about 6.6 V across the WS2814's red output (about 110 mW at 16.5 mA). The draft
+  adds a 120 ohm ballast resistor (R4) on red to take about 2 V (33 mW) of that off
+  the chip. With all four channels at full, the WS2814 then dissipates about
+  0.2 W worst case. Warm-white-only use is well below this.
+- The two LED candidates have different pinouts. Honglitronic has anodes on pins
+  1/3/5/7 (W/B/G/R) and cathodes on 2/4/6/8. TCWIN has anodes on 1-4 (R/G/B/W)
+  and cathodes on 8-5. The draft schematic follows the Honglitronic part.
 
 ### Interconnect
 
@@ -140,6 +155,19 @@ first-class requirement here.
   lines and similar measures. This is to be verified during design: in a reversal,
   a house's ground rides on the upstream data line, and the WS2814 data input is
   rated to only 9 V.
+- Draft protection (Pixel PCB schematic v0.1, estimated rather than tested):
+  - Reversed plug: the house's ground (and the ground of every house downstream)
+    returns through the upstream DOUT and through this house's DIN. About 2.6 mA
+    flows per house through its 2.7k VDD resistor, so about 16 mA for 6 houses,
+    since the LEDs stay dark with no valid data. A 1k series resistor (R2) plus a
+    BAT54S Schottky clamp (D1, DIN to GND and to VDD) carry this current around the
+    WS2814's input.
+  - Offset plug (a socket shifted one pin over on the header): 12 V can land on the
+    data pin. R2 limits this to about 7 mA into VDD through D1, where the WS2814's
+    internal regulator absorbs it. Its rating for this is not specified.
+  - DOUT keeps the datasheet's 100 ohm series resistor.
+  - **TBD:** the R2 value and whether D1 is needed. Confirm on the samples by
+    plugging in reversed and offset.
 - Flat servo cable fits the original cord channel. It is thinner than the classic
   120 V lamp cord that already uses it.
 
@@ -161,6 +189,10 @@ first-class requirement here.
 
 ### Pixel PCB
 
+- Draft schematic: `hardware/pixel/pixel.kicad_sch` (KiCad 9, v0.1). It was
+  written by a script without KiCad installed, so open it in KiCad and run ERC
+  before layout. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
+  5050 LED are not in KiCad's stock libraries. **TBD:** create them during layout.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
