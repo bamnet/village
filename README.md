@@ -105,8 +105,8 @@ We obviously want to modernize this with an LED.
   package. It is the fallback, with a standard SOIC-8 footprint.
 - Decided (2026-09-30): the Pixel PCB uses the WS2814F. Its smaller body leaves
   more room for the LEDs on the 20 mm board.
-- The WS2814F's FSOP-8 footprint (2.85 x 3.25 mm body, 0.8 mm pitch) is not in
-  KiCad's stock libraries, so we will draw it. Once it's proven on a fabricated
+- The WS2814F's FSOP-8 footprint (1.65 x 3.25 mm body, 2.85 mm lead span, 0.8 mm
+  pitch) is not in KiCad's stock libraries, so we drew it. Once it's proven on a fabricated
   board, consider contributing it (and a WS2814 symbol) upstream to the KiCad
   libraries.
 - Each channel drives 3 LEDs in series, and all 3 LEDs show the same color, with one
@@ -217,9 +217,24 @@ first-class requirement here.
 - The project targets KiCad 10. Files saved in KiCad 10 cannot be opened in
   KiCad 9.
 - Draft schematic: `hardware/pixel/pixel.kicad_sch` (v0.1). It was authored in
-  KiCad 9 format and is ERC clean in KiCad 9.0.2 and 10.0.6. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
-  5050 LED are not in KiCad's stock libraries, so those two fields are blank.
-  **TBD:** create them during layout.
+  KiCad 9 format and is ERC clean in KiCad 9.0.2 and 10.0.6.
+- Custom footprints live in the project library `hardware/pixel/village.pretty`
+  (nickname `village`), since neither part is in KiCad's stock libraries:
+  - `FSOP-8_1.65x3.25mm_P0.8mm` (U1, WS2814F). From the datasheet package drawing
+    (V1.1, p. 6): 0.35 mm leads with 0.4 mm feet. The land pattern is 0.9 x 0.45 mm
+    pads centered 2.6 mm apart (0.3 mm toe, 0.2 mm heel).
+  - `LED_Honglitronic_HL-5050RGBW_5.0x5.0mm_P1.2mm` (D2-D4). This is the
+    manufacturer's recommended land pattern (spec B-18-A-1651 rev A/2, p. 3):
+    1.1 x 0.54 mm pads, 2.83 mm inner gap, 1.2 mm pitch. Pads are numbered as in the
+    datasheet's top view: anodes 1/3/5/7 on the right, cathodes 2/4/6/8 on the
+    left, pin 1 at the top right. The part's corner mark sits at pin 2.
+  - **TBD:** the LED datasheet's "bottom view" labels the pins the same as its top
+    view, not mirrored, so one of the two views is wrong. A mirrored footprint
+    would put every LED in backwards. Before ordering boards, check a sample with
+    a multimeter in diode mode: with the corner mark at the top left, looking at
+    the lens, the top-right lead should be the white anode (+).
+  - **TBD:** both are unproven until a fabricated board is assembled and works.
+    The TCWIN LED would need its own footprint, because its pad numbering differs.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
