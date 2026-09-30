@@ -126,7 +126,10 @@ We obviously want to modernize this with an LED.
     (about 240 at JLCPCB, 860 at LCSC).
   - Cool-white variants that do not meet the spec: XINGLIGHT XL-5050RGBW
     (C7371891), TCWIN C784545 (6000 - 6500 K), and C784544 (3800 - 4200 K).
-  **TBD:** choose between them. The Honglitronic part is preferred.
+  **TBD:** choose between them. The Honglitronic part is preferred. One caution:
+  its spec sheet (B-18-A-1651 rev A/2, 2019) has "Under Development" checked on
+  its cover, not "Mass production". JLCPCB stocks it, so this is probably stale
+  paperwork, but weigh it against TCWIN once the samples arrive.
 - Heat is not expected to be a concern. The cut-up LED strip prototype ran without
   heat problems.
 - Driver heat (estimated): 3 red LEDs drop only 5.4 - 7.2 V, which leaves up to
@@ -162,20 +165,34 @@ first-class requirement here.
   a house's ground rides on the upstream data line, and the WS2814 data input is
   rated to only 9 V.
 - Draft protection (Pixel PCB schematic v0.1, estimated rather than tested):
-  - Reversed plug: the house's ground (and the ground of every house downstream)
-    returns through the upstream DOUT and through this house's DIN. About 2.6 mA
-    flows per house through its 2.7k VDD resistor, so about 16 mA for 6 houses,
-    since the LEDs stay dark with no valid data. A 1k series resistor (R2) plus a
-    BAT54S Schottky clamp (D1, DIN to GND and to VDD) carry this current around the
-    WS2814's input.
+  - Reversed plug: this house's GND pin lands on the upstream data line. The
+    return current of this house and every house downstream is about 2.6 mA per
+    house through its 2.7k VDD resistor, so about 16 mA for 6 houses, since the
+    LEDs stay dark with no valid data. Most of it flows through the upstream
+    house's R3 (100 ohm) into the upstream WS2814's DOUT. For the first house in
+    a chain, it flows into the Dig-Quad's output buffer instead. Only about
+    1 - 2 mA goes through this house's R2 (1k) and D1. The part at risk is
+    therefore the upstream driver. The datasheet rates DOUT sink current at 10 mA
+    minimum at 0.4 V (p. 3), which is less than 16 mA. While the upstream DOUT is
+    high, this house's ground rises to about 5 V. The current then splits between
+    R2/D1 (about 5 mA) and the upstream chip's VDD. D1's job is to clamp DIN so it
+    can't go below this house's lifted GND.
   - Offset plug (a socket shifted one pin over on the header): 12 V can land on the
-    data pin. R2 limits this to about 7 mA into VDD through D1, where the WS2814's
-    internal regulator absorbs it. Its rating for this is not specified.
+    data pin. R2 limits this to about 7 mA into VDD through D1, so R2 dissipates
+    about 45 mW (the 0402 is rated 62.5 mW). The pass/fail limit is the datasheet's
+    VDD absolute maximum of 3.7 - 5.3 V (p. 2), so VDD must stay at or below 5.3 V.
+  - Why keep D1: the datasheet limits logic input voltage to "VDD-0.7 ~ VDD+0.7"
+    (p. 2). The lower bound is almost certainly a typo for -0.7 V. Either way, DIN
+    may go only about 0.7 V beyond the rails. The BAT54S (Vf about 0.3 V) keeps
+    DIN inside that window in both the reversed and offset cases. A series
+    resistor alone would not.
   - DOUT keeps the datasheet's 100 ohm series resistor.
-  - **TBD:** the R2 value and whether D1 is needed. Test on the first fabricated
-    Pixel boards by plugging in reversed and offset. The LED samples on order
-    can't test this, since they don't include a WS2814F. Keep D1 on the first
-    run, because removing a part later is cheaper than a respin.
+  - **TBD:** the R2 value. Test on the first fabricated Pixel boards (the LED
+    samples on order don't include a WS2814F):
+    - Reversed plug: check that the upstream DOUT and the Dig-Quad output survive
+      and still work afterward.
+    - Offset plug: measure VDD with 12 V on DATA_IN. It must stay at or below 5.3 V.
+    No circuit change is planned until those results are in.
 - Flat servo cable fits the original cord channel. It is thinner than the classic
   120 V lamp cord that already uses it.
 
@@ -197,8 +214,10 @@ first-class requirement here.
 
 ### Pixel PCB
 
-- Draft schematic: `hardware/pixel/pixel.kicad_sch` (KiCad 9, v0.1). ERC is clean
-  in KiCad 9.0.2. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
+- The project targets KiCad 10. Files saved in KiCad 10 cannot be opened in
+  KiCad 9.
+- Draft schematic: `hardware/pixel/pixel.kicad_sch` (v0.1). It was authored in
+  KiCad 9 format and is ERC clean in KiCad 9.0.2 and 10.0.6. Footprints for the WS2814F (FSOP-8, 0.8 mm pitch) and the 8-pad
   5050 LED are not in KiCad's stock libraries, so those two fields are blank.
   **TBD:** create them during layout.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,

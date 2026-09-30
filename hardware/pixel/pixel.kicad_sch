@@ -1555,11 +1555,11 @@
 			(at 123.19 49.53 0)
 			(effects (font (size 1.27 1.27)) (justify left))
 		)
-		(property "Value" "1u 25V"
+		(property "Value" "1u 50V"
 			(at 123.19 52.07 0)
 			(effects (font (size 1.27 1.27)) (justify left))
 		)
-		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric"
 			(at 119.38 50.8 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
@@ -1567,15 +1567,15 @@
 			(at 119.38 50.8 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
-		(property "Description" "12 V local bypass for LED PWM current"
+		(property "Description" "12 V local bypass for LED PWM current. 0603/50 V keeps more of its 1 uF at 12 V DC bias than 0402/25 V"
 			(at 119.38 50.8 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
-		(property "LCSC" "C52923"
+		(property "LCSC" "C15849"
 			(at 119.38 50.8 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
-		(property "MPN" "CL05A105KA5NQNC"
+		(property "MPN" "CL10A105KB8NNNC"
 			(at 119.38 50.8 0)
 			(effects (font (size 1.27 1.27)) (hide yes))
 		)
@@ -2158,7 +2158,7 @@
 		(stroke (width 0) (type default))
 		(uuid "ea0d121c-fda0-56cc-9277-08a39730be05")
 	)
-	(label "R3_K"
+	(label "RED3_K"
 		(at 76.2 110.49 90)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "6e356def-980e-574b-a513-6e3fbf4f04b2")
@@ -2420,7 +2420,7 @@
 		(stroke (width 0) (type default))
 		(uuid "4b433331-a0d7-5c0f-a37e-43eda9a9fbd2")
 	)
-	(label "W1_K"
+	(label "WHT1_K"
 		(at 55.88 135.89 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "3c36f1ba-240a-517b-9c60-14010f850574")
@@ -2430,7 +2430,7 @@
 		(stroke (width 0) (type default))
 		(uuid "e70c0da9-d6d3-56a5-8cdb-cb0943f3705b")
 	)
-	(label "B1_K"
+	(label "BLU1_K"
 		(at 55.88 138.43 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "963172e9-f4c2-5a61-96db-18a15dc693f3")
@@ -2440,7 +2440,7 @@
 		(stroke (width 0) (type default))
 		(uuid "96fe347a-07b6-54cd-97fe-9b298ffed794")
 	)
-	(label "G1_K"
+	(label "GRN1_K"
 		(at 55.88 140.97 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "9947bbb9-2d12-5f17-b4f7-c6f0e01ac02e")
@@ -2450,7 +2450,7 @@
 		(stroke (width 0) (type default))
 		(uuid "1ac19e42-fc2e-54fe-8367-b4b4d737009d")
 	)
-	(label "R1_K"
+	(label "RED1_K"
 		(at 55.88 143.51 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "d8d665ad-b4e5-56e0-8347-23a87b6690cd")
@@ -2534,7 +2534,7 @@
 		(stroke (width 0) (type default))
 		(uuid "be54f3e6-78b9-536e-8a9d-e8fd0f727c44")
 	)
-	(label "W1_K"
+	(label "WHT1_K"
 		(at 81.28 135.89 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "0de55cd4-9cac-5fc5-9efe-5f8afc323d16")
@@ -2544,7 +2544,7 @@
 		(stroke (width 0) (type default))
 		(uuid "84003de1-fca9-5264-ae66-881dddcaaf5b")
 	)
-	(label "B1_K"
+	(label "BLU1_K"
 		(at 81.28 138.43 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "c48697c6-3250-5e9a-b4d8-f29298f0e054")
@@ -2554,7 +2554,7 @@
 		(stroke (width 0) (type default))
 		(uuid "bbea11c9-93f3-5eb1-9d39-7362d007d8dc")
 	)
-	(label "G1_K"
+	(label "GRN1_K"
 		(at 81.28 140.97 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "d6997d42-093d-5b3a-8fb2-f40eb26f3d2a")
@@ -2564,7 +2564,7 @@
 		(stroke (width 0) (type default))
 		(uuid "5aa3a607-7d10-5cc5-86b3-f5043ae781cc")
 	)
-	(label "R1_K"
+	(label "RED1_K"
 		(at 81.28 143.51 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "b230956d-195c-5057-84f8-208801ddd0f8")
@@ -2574,7 +2574,7 @@
 		(stroke (width 0) (type default))
 		(uuid "4de5be58-0a2e-5af7-a75d-01f6a9e14fb4")
 	)
-	(label "W2_K"
+	(label "WHT2_K"
 		(at 101.6 135.89 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "27eaf3cc-6ff8-5f58-af22-0a8277c53c38")
@@ -2584,7 +2584,7 @@
 		(stroke (width 0) (type default))
 		(uuid "42174adb-5373-5e2d-9723-03199dd51cf2")
 	)
-	(label "B2_K"
+	(label "BLU2_K"
 		(at 101.6 138.43 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "ffeff21c-d142-52a4-b571-b0045d3a406a")
@@ -2594,7 +2594,7 @@
 		(stroke (width 0) (type default))
 		(uuid "195b9bf1-a2a2-5c7d-95db-662ad77ddfdc")
 	)
-	(label "G2_K"
+	(label "GRN2_K"
 		(at 101.6 140.97 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "a1e7f2b3-fdb1-5e5c-bc98-36a830b1c13d")
@@ -2604,7 +2604,7 @@
 		(stroke (width 0) (type default))
 		(uuid "728aaeee-9630-5c32-b2f2-cbba792304b0")
 	)
-	(label "R2_K"
+	(label "RED2_K"
 		(at 101.6 143.51 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "9998ba25-d716-5ddb-9125-84a4f1db73d1")
@@ -2688,7 +2688,7 @@
 		(stroke (width 0) (type default))
 		(uuid "ef09ed2e-f182-5bc7-a8ba-24c7ef6024e6")
 	)
-	(label "W2_K"
+	(label "WHT2_K"
 		(at 127 135.89 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "519cfbcd-afd8-5e49-b3de-16dcbe579f04")
@@ -2698,7 +2698,7 @@
 		(stroke (width 0) (type default))
 		(uuid "0b29db93-2a19-57e7-9d4b-675a2cf987d0")
 	)
-	(label "B2_K"
+	(label "BLU2_K"
 		(at 127 138.43 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "db847945-f3fe-559f-bbfb-585e92a37557")
@@ -2708,7 +2708,7 @@
 		(stroke (width 0) (type default))
 		(uuid "3490dea4-ec6b-5b2a-a9dc-537ad7652158")
 	)
-	(label "G2_K"
+	(label "GRN2_K"
 		(at 127 140.97 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "b08db588-eb8b-5ce3-988b-3b01708686e6")
@@ -2718,7 +2718,7 @@
 		(stroke (width 0) (type default))
 		(uuid "5791799c-9bfa-5f9c-820c-b59e619369f0")
 	)
-	(label "R2_K"
+	(label "RED2_K"
 		(at 127 143.51 180)
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "684cff6c-8a52-5b96-95dd-1efce86589fd")
@@ -2758,7 +2758,7 @@
 		(stroke (width 0) (type default))
 		(uuid "c2d49a12-22d6-519c-9529-6583499d0b4b")
 	)
-	(label "R3_K"
+	(label "RED3_K"
 		(at 147.32 143.51 0)
 		(effects (font (size 1.27 1.27)) (justify left bottom))
 		(uuid "354b7c37-014f-5397-baaa-7b15f2e61fbe")
@@ -2968,7 +2968,7 @@
 		(effects (font (size 1.27 1.27)) (justify right bottom))
 		(uuid "2cbc2f4d-d8f3-573a-b357-4191e93fb6e9")
 	)
-	(text "Pixel PCB (one per house). 12 V, WS2814F driver, 3 x RGBW 5050 LEDs, 3 per channel in series.\nChain in on J1 (male), out on J2 (female). Servo pinout: 1 = data, 2 = +12 V, 3 = GND.\nReversed plug: GND and data swap. The house's local ground then returns through the upstream DOUT\nand through our DIN pin. R2 + D1 carry that current around the WS2814 input.\nOffset plug (one pin over): 12 V can land on DATA_IN. R2 limits the current into VDD through D1.\nR4 moves ~2 V of the red channel's excess headroom off the WS2814 (red Vf 1.8-2.4 V x3).\nWS2814F data order is W,R,G,B (datasheet p.4); set the color order in WLED to match.\nTBD: R2 value, whether D1 is needed, R4 value, custom footprints for U1 and D2-D4."
+	(text "Pixel PCB (one per house). 12 V, WS2814F driver, 3 x RGBW 5050 LEDs, 3 per channel in series.\nChain in on J1 (male), out on J2 (female). Servo pinout: 1 = data, 2 = +12 V, 3 = GND.\nReversed plug: GND and data swap. This house's ground (and everything downstream) returns mostly\nthrough the upstream R3/DOUT (DOUT sink rated 10 mA min at 0.4 V). D1 clamps our DIN within the rails,\nand R2 limits the current through D1.\nOffset plug (one pin over): 12 V can land on DATA_IN. R2 limits the current into VDD through D1\n(~7 mA); VDD must stay under its 5.3 V absolute max.\nR4 moves ~2 V of the red channel's excess headroom off the WS2814 (red Vf 1.8-2.4 V x3).\nWS2814F data order is W,R,G,B (datasheet p.4); set the color order in WLED to match.\nTBD: R2 value, R4 value, custom footprints for U1 and D2-D4. Fab-board tests: reversed plug\n(upstream DOUT / Dig-Quad output survive), offset plug (VDD <= 5.3 V)."
 		(exclude_from_sim no)
 		(at 25.4 160.02 0)
 		(effects (font (size 1.27 1.27)) (justify left top))
