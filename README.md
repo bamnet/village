@@ -277,9 +277,24 @@ first-class requirement here.
   - The header rows are 8.9 mm apart, center to center. KiCad's stock
     footprints need at least 8.62 mm, which is slightly more than the estimated
     8 mm plug width.
-  - The stock right-angle footprints give mirrored pin orders: J1's pin 1 is at
-    the west end and J2's pin 1 at the east end, so the two GND pins are adjacent.
-    The real LCSC parts (C492411, C2897385) may differ. Check their drawings.
+  - J1 and J2 use KiCad's stock right-angle footprints. Checked against the LCSC
+    drawings on 2026-09-30, and the copper matches:
+    - J1, male (XFCN PZ254R-11-03P, C492411): Ø1.02 mm holes and 0.64 mm square
+      pins (0.91 mm across the corners, so they fit the 1.0 mm drill). The
+      body's front face is 4.4 mm from the pin row, and the pin tips are at
+      10.4 mm (KiCad draws 4.04 mm and 10.04 mm).
+    - J2, female (HCTL PM254-1-03-W-8.5, C2897385): Ø1.02 mm holes. The 8.5 mm
+      body ends 10.2 mm from the pin row (KiCad draws 10.03 mm), and the body is
+      8.02 mm wide (KiCad draws 7.62 mm).
+    - KiCad's courtyards still cover both real bodies. With the rows 8.9 mm apart,
+      the bodies are about 1.1 mm apart.
+    - The pin tails are 3.0 and 3.2 mm long, so on a 1.6 mm board they stick up
+      about 1.4 - 1.6 mm on the LED side.
+  - Pin order: the stock footprints put J1's pin 1 at the west end and J2's pin 1
+    at the east end, so the two GND pins are adjacent. Neither part is polarized,
+    so this only decides which way up each cable plugs in.
+    **TBD:** consider a bottom silkscreen mark at each pin 1 (data) so plugs go in
+    the right way.
   - On the top side, the LEDs follow the chain +12V -> D2 (east, rot 90) -> D3
     (south, rot 0) -> D4 (west, rot 270) -> U1. Each LED faces the side that
     connects to the next LED toward it, so each group of four color nets between
