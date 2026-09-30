@@ -172,8 +172,10 @@ first-class requirement here.
     data pin. R2 limits this to about 7 mA into VDD through D1, where the WS2814's
     internal regulator absorbs it. Its rating for this is not specified.
   - DOUT keeps the datasheet's 100 ohm series resistor.
-  - **TBD:** the R2 value and whether D1 is needed. Confirm on the samples by
-    plugging in reversed and offset.
+  - **TBD:** the R2 value and whether D1 is needed. Test on the first fabricated
+    Pixel boards by plugging in reversed and offset. The LED samples on order
+    can't test this, since they don't include a WS2814F. Keep D1 on the first
+    run, because removing a part later is cheaper than a respin.
 - Flat servo cable fits the original cord channel. It is thinner than the classic
   120 V lamp cord that already uses it.
 
