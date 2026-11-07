@@ -126,10 +126,10 @@ We obviously want to modernize this with an LED.
     (about 240 at JLCPCB, 860 at LCSC).
   - Cool-white variants that do not meet the spec: XINGLIGHT XL-5050RGBW
     (C7371891), TCWIN C784545 (6000 - 6500 K), and C784544 (3800 - 4200 K).
-  **TBD:** choose between them. The Honglitronic part is preferred. One caution:
-  its spec sheet (B-18-A-1651 rev A/2, 2019) has "Under Development" checked on
-  its cover, not "Mass production". JLCPCB stocks it, so this is probably stale
-  paperwork, but weigh it against TCWIN once the samples arrive.
+  **Chosen: Honglitronic C22470444.** We tested samples of both parts in 2026-11.
+  The Honglitronic white was warmer and slightly preferred. Its spec sheet
+  (B-18-A-1651 rev A/2, 2019) has "Under Development" checked on its cover, not
+  "Mass production", but JLCPCB stocks it, so this looks like stale paperwork.
 - Heat is not expected to be a concern. The cut-up LED strip prototype ran without
   heat problems.
 - Driver heat (estimated): 3 red LEDs drop only 5.4 - 7.2 V, which leaves up to
@@ -137,9 +137,13 @@ We obviously want to modernize this with an LED.
   adds a 120 ohm ballast resistor (R4) on red to take about 2 V (33 mW) of that off
   the chip. With all four channels at full, the WS2814 then dissipates about
   0.2 W worst case. Warm-white-only use is well below this.
-- The two LED candidates have different pinouts. Honglitronic has anodes on pins
-  1/3/5/7 (W/B/G/R) and cathodes on 2/4/6/8. TCWIN has anodes on 1-4 (R/G/B/W)
-  and cathodes on 8-5. The draft schematic follows the Honglitronic part.
+- The two LED candidates number their pins differently. Honglitronic has anodes on
+  pins 1/3/5/7 (W/B/G/R) and cathodes on 2/4/6/8. TCWIN has anodes on 1-4 (R/G/B/W)
+  and cathodes on 8-5. Physically they match: with the corner mark at the top
+  left, looking at the lens, both put the anodes on the right with white at the
+  top, and each cathode is directly across from its anode. A multimeter check of
+  both samples (2026-11) confirmed this for white. The schematic and footprint use
+  the Honglitronic numbering.
 
 ### Interconnect
 
@@ -227,14 +231,18 @@ first-class requirement here.
     manufacturer's recommended land pattern (spec B-18-A-1651 rev A/2, p. 3):
     1.1 x 0.54 mm pads, 2.83 mm inner gap, 1.2 mm pitch. Pads are numbered as in the
     datasheet's top view: anodes 1/3/5/7 on the right, cathodes 2/4/6/8 on the
-    left, pin 1 at the top right. The part's corner mark sits at pin 2.
-  - **TBD:** the LED datasheet's "bottom view" labels the pins the same as its top
-    view, not mirrored, so one of the two views is wrong. A mirrored footprint
-    would put every LED in backwards. Before ordering boards, check a sample with
-    a multimeter in diode mode: with the corner mark at the top left, looking at
-    the lens, the top-right lead should be the white anode (+).
-  - **TBD:** both are unproven until a fabricated board is assembled and works.
-    The TCWIN LED would need its own footprint, because its pad numbering differs.
+    left, pin 1 at the top right. The part's corner mark sits at pin 2 (white
+    cathode), and the footprint's silkscreen tick and Fab chamfer mark that
+    corner. KiCad's usual pin-1 marking would put the tick on the white anode,
+    which would make a correctly placed LED look rotated in review.
+  - The LED datasheet's "bottom view" labels the pins the same as its top view,
+    not mirrored, so one of the two views is wrong. A 2026-11 multimeter check of
+    a sample (diode mode, red lead on the anode) showed that the top view is
+    correct. With the corner mark at the white cathode, the white anode is directly
+    across from it. That is the footprint as drawn, not a mirror image.
+  - **TBD:** both footprints are unproven until a fabricated board is assembled and
+    works. The TCWIN LED would fit the same pads, but its symbol pin numbers would
+    need remapping, because its pad numbering differs.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
