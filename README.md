@@ -339,6 +339,12 @@ first-class requirement here.
     The same comparison reproduces Konnect's preview-verified SOIC-8 rule. The LEDs
     need no correction. Still check every part in JLCPCB's placement preview,
     especially the bottom-side headers J1 and J2.
+  - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
+    after the silkscreen version. Each has the exact uploaded files and a
+    `MANIFEST.md` with the source commit, file hashes, checks, and the order
+    record. When an order is placed, fill in the manifest and tag the commit
+    `pixel-<version>`. An ordered release is never changed. A design change bumps
+    the silkscreen version and gets a new folder.
   - **TBD:** revisit the header positions once real plugs are measured.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
