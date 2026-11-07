@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "policy_id": "village-pixel-jlcpcb-cpl-v1",
+  "provenance": "2026-11-07: each KiCad footprint compared with JLCPCB's EasyEDA footprint for the BOM part (C5446694 WS2814F, C19726 BAT54S) by matching pad numbers. The method reproduces Konnect's preview-verified SOIC-8 +270 rule (C7593, C7950). The HL-5050RGBW LEDs (C22470444) need no correction. Confirm in JLCPCB Component Placements.",
+  "footprint_rules": [
+    {
+      "id": "village-fsop-8-ws2814f",
+      "footprint_prefix": "FSOP-8_1.65x3.25mm_P0.8mm",
+      "rotation_degrees": 270
+    },
+    {
+      "id": "kicad-sot-23-bat54s",
+      "footprint_prefix": "SOT-23",
+      "rotation_degrees": 180
+    }
+  ],
+  "component_overrides": []
+}

@@ -330,6 +330,21 @@ first-class requirement here.
     because the standalone jar needs Java 25. Import the session in KiCad with
     File -> Import -> Specctra Session. Konnect's own DSN export refuses this
     board (round outline, back-side headers, custom rules).
+  - JLCPCB export: Konnect's `export_manufacturing_package` with the board open in
+    KiCad, `fab_house` jlcpcb, all copper/paste/silkscreen/mask layers plus
+    Edge.Cuts, BOM fields `Value,Reference,Footprint,LCSC`, and
+    `jlcpcb_cpl_corrections_path` set to `jlcpcb_cpl_corrections.json`. That file
+    rotates U1 by 270 degrees and D1 by 180 degrees in the CPL. Both values came
+    from comparing our footprints with JLCPCB's EasyEDA footprints for the BOM parts.
+    The same comparison reproduces Konnect's preview-verified SOIC-8 rule. The LEDs
+    need no correction. Still check every part in JLCPCB's placement preview,
+    especially the bottom-side headers J1 and J2.
+  - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
+    after the silkscreen version. Each has the exact uploaded files and a
+    `MANIFEST.md` with the source commit, file hashes, checks, and the order
+    record. When an order is placed, fill in the manifest and tag the commit
+    `pixel-<version>`. An ordered release is never changed. A design change bumps
+    the silkscreen version and gets a new folder.
   - **TBD:** revisit the header positions once real plugs are measured.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
