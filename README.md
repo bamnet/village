@@ -293,7 +293,8 @@ first-class requirement here.
       10.4 mm (KiCad draws 4.04 mm and 10.04 mm).
     - J2, female (HCTL PM254-1-03-W-8.5, C2897385): Ø1.02 mm holes. The 8.5 mm
       body ends 10.2 mm from the pin row (KiCad draws 10.03 mm), and the body is
-      8.02 mm wide (KiCad draws 7.62 mm).
+      8.02 mm wide (KiCad draws 7.62 mm). A purchased sample measured about
+      8.09 mm wide (2026-11).
     - KiCad's courtyards still cover both real bodies. With the rows 8.9 mm apart,
       the bodies are about 1.1 mm apart.
     - The pin tails are 3.0 and 3.2 mm long, so on a 1.6 mm board they stick up
