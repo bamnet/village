@@ -260,8 +260,8 @@ first-class requirement here.
 - All surface-mount parts, the WS2814 included, SHOULD also go on the top side. That
   keeps assembly to one surface-mount side, which is simpler and cheaper. Moving the
   WS2814 to the bottom is allowed if the LEDs don't fit otherwise, but it requires
-  JLCPCB two-sided (Standard) assembly. **TBD:** settle this during layout, once the
-  LED part is chosen.
+  JLCPCB two-sided (Standard) assembly. Settled in layout: every surface-mount
+  part, the WS2814F included, is on the top side.
 - Through-hole header pins and solder joints come out on the LED side. Headers
   MUST sit near the rim, with a centered keep-out for the LEDs.
 - Headers SHOULD be right-angle, mounted side by side on the bottom, with both
