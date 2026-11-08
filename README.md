@@ -161,7 +161,8 @@ first-class requirement here.
   pitch), bought ready-made. 1 m male-to-female cables are widely sold. 22 AWG is
   preferred over 26 AWG for lower voltage drop.
 - Boards MUST use 2.54 mm pitch 1x3 headers: male pins for the incoming cable and a
-  female socket for the outgoing cable. JLCPCB solders these through-hole parts.
+  female socket for the outgoing cable. JLCPCB SHOULD solder these through-hole
+  parts (v0.1 headers were hand-soldered; see the Pixel PCB section).
 - Pinout MUST put power on the middle pin, following the servo convention. Then a
   reversed plug swaps ground and data rather than shorting the supply. The design
   SHOULD tolerate a reversed plug without damage, using series resistors on data
@@ -307,8 +308,8 @@ first-class requirement here.
       "-" at the other pins. These shapes read the same whether or not they are
       mirrored.
     - Bottom: "JLCJLCJLCJLC" marks where JLCPCB should print its order number.
-      When ordering, choose "Specify a location" for the order number. Otherwise
-      it could land among the LEDs.
+      The 2026-11 order form had no "Specify a location" option, so v0.1 was
+      ordered with "Mark on PCB: Remove Mark" instead.
     - Top: "v0.1", and a pin-1 dot inside U1's outline. The footprint's pin-1
       silkscreen line is clipped by J1's GND pad, so without the dot the top and
       bottom lines would look alike.
@@ -337,8 +338,16 @@ first-class requirement here.
     rotates U1 by 270 degrees and D1 by 180 degrees in the CPL. Both values came
     from comparing our footprints with JLCPCB's EasyEDA footprints for the BOM parts.
     The same comparison reproduces Konnect's preview-verified SOIC-8 rule. The LEDs
-    need no correction. Still check every part in JLCPCB's placement preview,
-    especially the bottom-side headers J1 and J2.
+    need no correction. JLCPCB's placement preview for v0.1 confirmed U1, D1 and
+    the LEDs.
+  - JLCPCB's Economic assembly is single-sided, so it leaves off the bottom-side
+    headers J1 and J2. Standard assembly can do both sides but needs a board of at
+    least 70 mm. v0.1 (5 boards) was assembled top side only, with J1/J2
+    hand-soldered.
+  - **TBD:** for the 22-board run, either order a JLCPCB panel of at least 70 mm
+    (for example 4 x 4) with Standard two-sided assembly, or move the headers so
+    that single-sided assembly covers them. Hand soldering MUST be kept to a
+    minimum.
   - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
     after the silkscreen version. Each has the exact uploaded files and a
     `MANIFEST.md` with the source commit, file hashes, checks, and the order

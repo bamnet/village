@@ -1,8 +1,7 @@
 # Pixel PCB v0.1 — JLCPCB package
 
-Status: **exported, not yet ordered.** When the order is placed, fill in the
-order section and tag the commit `pixel-v0.1`. Do not change these files after
-ordering. A design change gets a new silkscreen version and a new folder.
+Status: **ordered 2026-11-07** (tag `pixel-v0.1`). Do not change these files.
+A design change gets a new silkscreen version and a new folder.
 
 ## Source
 
@@ -32,11 +31,24 @@ ordering. A design change gets a new silkscreen version and a new folder.
 
 ## Order
 
-- Date:
-- JLCPCB order number:
-- Quantity / options (finish, color, order-number location):
-- Placement preview notes (any rotations changed by hand):
-- Cost:
+- Date: 2026-11-07
+- JLCPCB order numbers: PCB `Y12-3347415A`, assembly `SMT026110860016`
+- PCB: 5 pcs, FR-4, 2 layers, 1.6 mm, green with white silkscreen, FR4 TG135,
+  LeadFree HASL, 1 oz, tented vias, 0.3 mm min via, ±0.2 mm outline, flying
+  probe test, single PCB (no panel), no deburring. Mark on PCB: Remove Mark,
+  so no order number is printed and the "JLCJLCJLCJLC" text is just silkscreen.
+- Assembly: Economic, top side only, 5 pcs, tooling holes by JLCPCB, Confirm
+  Parts Placement: Yes, parts by customer, high-temp paste.
+- **J1/J2 are not assembled.** Economic assembly is single-sided and drops the
+  bottom-side headers, and Standard (two sides) requires a board of at least
+  70 mm. J1 (C492411) and J2 (C2897385) are hand-soldered from parts on hand.
+  The uploaded BOM/CPL still list them; JLCPCB ignored the bottom-side lines.
+- Placement preview: all 9 top-side lines matched their LCSC parts with no
+  stock warnings. U1, D1 and D2–D4 orientations checked against the footprints
+  and correct, so no rotations were changed by hand. D1 bought 10 and the LEDs
+  15 (JLCPCB minimums/attrition).
+- Cost: PCB $5.10, assembly $22.50, shipping $29.09, duties/taxes and fees
+  $15.37, discount −$6.00. Total $66.06.
 
 ## Results
 
