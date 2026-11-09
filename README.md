@@ -354,7 +354,9 @@ first-class requirement here.
     record. When an order is placed, fill in the manifest and tag the commit
     `pixel-<version>`. An ordered release is never changed. A design change bumps
     the silkscreen version and gets a new folder.
-  - **TBD:** revisit the header positions once real plugs are measured.
+  - **TBD:** revisit the header positions once real plugs are measured. The
+    house holder now favors vertical headers; see "Feedback for Pixel PCB v0.2"
+    in the House holder section.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
@@ -395,22 +397,26 @@ and +Z points into the house.
   Everything below the wall MUST fit inside the shallowest recess (12 mm measured)
   and inside its outline.
 - The holder may reach up to 25 mm into the house.
-- The plugs drive the layout. They lie flat under the board and run south past its
-  edge, to about 15 mm (J1) and 21 mm (J2) from center. That is further than any
-  hole's radius. So the PCB MUST sit at or outside the wall's outer face, never
-  inside the hole. A future PCB with different headers could change this.
-- The plug and cable direction MUST be adjustable after installation: toward the
-  cord notch for bottom-lit houses, and down for back-lit houses.
-- A tug on a cable MUST load the holder, not the headers' solder joints.
+- The PCB SHOULD sit inside the house, above the wall's inner surface, so the
+  hole's rim doesn't block the light. That calls for vertical headers: the plugs
+  then hang straight down through the hole. (The right-angle-header draft, which
+  kept the PCB outside the wall, is preserved at git tag
+  `holder-right-angle-draft`. Its arms formed a tall tube around the LEDs that
+  passed only about 20% of the light directly.)
+- The cables MUST be able to leave toward the cord notch (bottom-lit) or
+  downward (back-lit).
+- A tug on a cable MUST load the holder, not the headers' solder joints. The
+  plugs MUST NOT slide off their headers, even hanging plug-down.
 - Print in PETG on the Ender 3 Pro (0.4 mm nozzle), without supports where
   possible.
 
-#### Design (draft)
+#### Design (draft, vertical headers)
 
-Two printed parts:
+One printed part, `holder.scad`:
 
-- **Clip ring** (`clip.scad`): a flange (Ø34 x 2.4 mm, Ø26.4 opening) sits against the outside of
-  the wall. Three arms rise through the hole, each with a barb on its free end.
+- **Clip ring** (`clip.scad`): a flange (Ø34 x 2.4 mm, Ø26.4 opening) sits against
+  the outside of the wall. Three arms rise through the hole, each with a barb on
+  its free end.
   - The arms curve around the axis and flex in the XY plane, so the layer lines
     never take bending loads.
   - The hole's inner edge rests on the barb's sloped lower face. The arm springs
@@ -426,45 +432,67 @@ Two printed parts:
     - Insertion: the barb tip must squeeze through Ø24 whatever the wall.
   - Arms are about 19 mm long. Root strain when squeezed through a 24 mm hole is
     about 1.8 - 2.2%, which suits PETG.
-  - The arms reach 18 - 20 mm into the house.
-- **Carrier** (`carrier.scad`): holds the PCB and plugs, and snaps onto the clip
-  ring's rim from outside the house.
-  - The rim groove is a full circle, so the carrier swivels to aim the cables.
-  - The PCB goes in from below, LED side up, against a lip at r ≥ 9.75 mm. The
-    top-side parts reach r 9.62 mm.
-  - The plugs lie in a cradle running south, and a cable tie through the floor
-    clamps both cables.
-  - The LED tops stay below the arms, so the arms can flex inward over them.
-    The clearance is only about 0.3 mm (the LED tops are 2.7 mm below the wall
-    face, and the arms start 2.4 mm below it).
-  - The stack below the wall is 10.0 mm, against the 12 mm minimum recess.
-- `pixel_mock.scad` models the board (KiCad courtyards), headers, plugs and
-  cables. `assembly.scad` shows the parts installed in a wall section. Its
-  `check` setting renders the overlap between two parts. All three overlaps come
-  out empty; the clip and carrier only touch, which is intended. The check uses
-  the arms at rest, not bent.
+  - The arm tops are 15.7 mm into the house (40 degree lead-in).
+- **Posts:** the three arm roots continue up past the arms. Each has a ledge under
+  the PCB's edge and a hook lip over it, so the board snaps in from above, LED
+  side up.
+  - The roots thicken inward (to r 7.5 mm) below the arm tops, to anchor the
+    arms.
+  - The hooks sit where the board's top-side parts leave room.
+- **PCB position:** the board's underside is 17.1 mm into the house and the LED tops
+  are at 20.3 mm, above the thickest wall. The ring is turned (`arm_rot`) so the
+  barbs, which bend inward furthest, point away from the plugs.
+- **Plugs:** both hang straight down the middle and end flush with the flange's
+  underside. J1 (male header, 2.5 mm body + 14.5 mm plug) and J2 (5 mm low-profile
+  socket + 14.5 mm plug) set the board height.
+- **Cables:** a cable tie through one of four slot pairs in the flange straps both
+  cables to the flange's underside, pointing toward the cord notch. That holds
+  the plugs on, takes tugs off the headers, and gives a handle to pull the holder
+  out. A groove on the wall side keeps the tie flush.
+- In bottom-lit houses, only the flange (2.4 mm) and the cables' bend sit in the
+  recess.
+- `pixel_mock.scad` models the board (KiCad courtyards) with vertical headers,
+  plugs and cables. `assembly.scad` shows the holder installed in a wall section.
+  Its `check` setting renders overlaps:
+  - `holder_mock`: the holder at rest against the board, headers, plugs and
+    cables. Empty; the hook lips only touch the board.
+  - `sweep_mock`: the space the arms sweep through when squeezed through a 24 mm
+    hole. It overlaps the east corner of the J2 socket and plug by up to about
+    0.4 mm (0.3 mm³; still about 0.1 mm³ at a 25 mm hole). See the open items.
 
 #### Open items
 
-- **TBD:** servo plug dimensions. The model assumes 7.8 x 2.54 x 14.5 mm. The plugs
-  mate on pins 1.27 mm below the board, so a plug thicker than 2.54 mm hits the
-  board. Measure this as soon as the cables arrive (bought 2026-11-07).
+- **TBD:** servo plug dimensions. The model assumes 7.8 x 2.54 x 14.5 mm. The
+  plug lengths set the board height.
+- **TBD:** a low-profile 1x3 female socket for J2, about 5 mm tall. A standard
+  8.5 mm socket raises the board by 3.5 mm, to LED tops at about 23.8 mm (the
+  limit is 25).
+- **TBD:** the arm sweep reaches the J2 corner in 24 - 25 mm holes. v0.1's pin
+  rows are 4 mm north of center, so the plug block's corners sit at r 9.95 - 10.07
+  mm, only 0.3 - 0.45 mm inside the arms. Touching only while pushing in is
+  harmless. But in a small hole the arm stays bent, and its grip would rest
+  partly on the plug instead of the wall. Fix on v0.2 (see the Pixel PCB items
+  below) or by narrowing the plugs' spacing.
+- **TBD:** the cable bend: two cables turn 90 degrees right under the flange
+  (inside the recess, or behind a back-lit house). Check with real cables.
 - **TBD:** the LED package height (assumed 1.6 mm).
-- **TBD:** the recess outline. The carrier needs about 36 mm across the hooks and
-  27 mm south of center for the cradle.
-- **TBD:** the light lost to the hole's rim. The LED tops sit about 2.7 mm below
-  the wall's outer face, and the board about 4.3 mm below it.
-- **TBD:** back-lit houses: confirm there is about 10 mm of room behind the wall
-  for the flange and carrier, plus room for the cables to bend.
-- **TBD:** removal. The holder comes out every year, but the carrier's hooks
-  are a shallow detent. A pull on the carrier will probably pop the hooks before
-  the clip ring lets go of the house, leaving a flush flange in a 12 mm recess.
-  Either the carrier joint must hold harder than the clip ring's pull-out force,
-  or the flange needs a pull tab or pry notch. The coupon test can't show this,
-  because there you grab the flange directly.
-- The carrier's hooks and its single PCB retention bump are first guesses. With
-  0.65 mm of clearance around the board, one 0.3 mm bump on the north wall
-  probably won't hold it. Tune both once the clip ring is proven.
+- The post hooks and ledges are first guesses. Tune them once the clip ring is
+  proven. Coupon variant C's arms (top 16.9 mm) are too tall for the current
+  board height; it is in the coupon only to test the barb slope.
+
+#### Feedback for Pixel PCB v0.2
+
+- Keep the vertical headers on the bottom, with a low-profile female socket for
+  J2.
+- Keep the plug block clear of the arms' sweep: every header and plug corner
+  within about r 9.5 mm. For example, move the pin rows about 1 mm toward
+  center.
+- Keep a clear ring at the edge of the top side for the hook lips (parts at
+  r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm.
+- Add an orientation feature, such as a notch, flat or small hole at the edge,
+  so the board seats the same way every time.
+- White solder mask, as the 2025 spec asked; v0.1 is green.
+- Center the LED cluster (v0.1's sits about 2.5 mm south of center).
 
 #### Test plan
 
@@ -488,7 +516,10 @@ Two printed parts:
      more. Check that it still grips the Ø29 x 3 ring afterward.
    - Wear: insert and remove about 20 times in any ring, and check that the
      arms still spring back.
-5. Try the best variant in several real houses, both bottom-lit and back-lit.
+5. When the boards and cables arrive: solder vertical headers to one v0.1
+   board, measure the plugs, and update `params.scad`. Then print `holder.scad`
+   with the best variant's arms. Check the snap-in, the cable tie, the cable bend
+   in a real recess, and the light inside a house.
 
 ### Base station
 

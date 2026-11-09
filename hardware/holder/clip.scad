@@ -5,7 +5,8 @@
 // curve around the axis and flex in the XY plane, so printing them upright
 // never loads the layer lines in bending. Print flange down, no supports.
 //
-// Render this file on its own to see a single clip ring.
+// holder.scad builds the full holder on top of this. Render this file on its
+// own to see a single clip ring.
 
 include <params.scad>
 
@@ -17,8 +18,9 @@ function arm_top(w, k, r3 = barb_r_at_wall_min) =
 // Bending strain at the arm root when the barb is squeezed through hole_min.
 // Cantilever estimate: 1.5 * thickness * deflection / length^2.
 function arm_len() = (arm_r_in + 0.5) * arm_ang * PI / 180;
+function barb_bend(k, r3 = barb_r_at_wall_min) = barb_tip_r(k, r3) - hole_min / 2;
 function arm_strain(w, k, r3 = barb_r_at_wall_min) =
-    1.5 * w * (barb_tip_r(k, r3) - hole_min / 2) / pow(arm_len(), 2);
+    1.5 * w * barb_bend(k, r3) / pow(arm_len(), 2);
 
 module barb_profile(w, k, r3) {
     r_out = arm_r_out(w);
@@ -35,18 +37,13 @@ module barb_profile(w, k, r3) {
 }
 
 module flange() {
-    g_z = -flange_t / 2;
-    r = flange_od / 2;
     rotate_extrude()
-        difference() {
-            translate([flange_id / 2, -flange_t]) square([r - flange_id / 2, flange_t]);
-            // V groove in the rim for the carrier's hooks.
-            polygon([[r + 0.01, g_z - groove_d], [r - groove_d, g_z],
-                     [r + 0.01, g_z + groove_d]]);
-        }
+        translate([flange_id / 2, -flange_t])
+            square([flange_od / 2 - flange_id / 2, flange_t]);
 }
 
-module clip_ring(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, label = "") {
+module clip_ring(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, label = "",
+                 rot = arm_rot) {
     top = arm_top(w, k, r3);
     r_out = arm_r_out(w);
     assert(r3 > hole_max / 2, "no preload in the loosest hole (hole_max, wall_min)");
@@ -58,7 +55,7 @@ module clip_ring(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, label = "") {
     difference() {
         union() {
             flange();
-            for (i = [0 : arm_n - 1]) rotate(i * 360 / arm_n) {
+            for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n) {
                 // Root block: ties the arm to the flange.
                 rotate_extrude(angle = arm_root_ang) {
                     translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
@@ -85,6 +82,37 @@ module clip_ring(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, label = "") {
              " tip r=", barb_tip_r(k, r3), " top z=", top,
              " preload at hole_max/wall_min=", r3 - hole_max / 2,
              " root strain at hole_min=", round(arm_strain(w, k, r3) * 1000) / 10, "%"));
+}
+
+// Space the arms sweep through when squeezed through hole_min (for clearance
+// checks, not printing). Each slice of arm moves inward by the cantilever
+// deflection at that point; the barb moves by the full amount.
+module arm_sweep(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, rot = arm_rot,
+                 steps = 24) {
+    d = barb_bend(k, r3);
+    top = arm_top(w, k, r3);
+    function defl(x) = d * x * x * (3 - x) / 2;   // x = 0 at root, 1 at tip
+    for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n + arm_root_ang) {
+        for (s = [0 : steps - 1]) {
+            a0 = arm_ang * s / steps;
+            a1 = arm_ang * (s + 1) / steps;
+            am = (a0 + a1) / 2;
+            hull() {
+                rotate(a0) rotate_extrude(angle = a1 - a0)
+                    translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
+                translate(-defl((s + 1) / steps) * [cos(am), sin(am), 0])
+                    rotate(a0) rotate_extrude(angle = a1 - a0)
+                        translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
+            }
+        }
+        am = arm_ang - barb_ang / 2;
+        hull() {
+            rotate(arm_ang - barb_ang) rotate_extrude(angle = barb_ang) barb_profile(w, k, r3);
+            translate(-d * [cos(am), sin(am), 0])
+                rotate(arm_ang - barb_ang) rotate_extrude(angle = barb_ang)
+                    barb_profile(w, k, r3);
+        }
+    }
 }
 
 clip_ring();

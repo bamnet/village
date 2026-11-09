@@ -2,7 +2,11 @@
 //
 // Coordinates: Z = 0 is the house wall's outer face (the face the flange
 // presses against). +Z points into the house. +Y is "north" on the Pixel PCB
-// (KiCad -Y). The plugs and cables leave toward -Y ("south").
+// (KiCad -Y).
+//
+// Layout (vertical headers): the PCB sits on posts above the arms, inside the
+// house, LEDs up. Both plugs hang straight down through the middle of the
+// hole, and the cables are tied to the flange's underside.
 //
 // See the "House holder" section of the top-level README for the spec.
 
@@ -25,12 +29,13 @@ flange_t  = 2.4;   // flange thickness
 flange_od = 34;    // flange outer diameter; must clear hole_max with a contact ring
 flange_id = 26.4;  // flange inner diameter; clears the barbs' undersides
 
-groove_d  = 0.6;   // depth of the V groove in the flange rim (carrier hooks)
-
 arm_n        = 3;     // number of arms
 arm_r_in     = 10.4;  // arm inner radius at rest (PCB is r 10.03)
 arm_w        = 1.0;   // arm radial thickness (the main tuning knob)
-arm_root_ang = 12;    // angular width of each arm's root block
+arm_root_ang = 12;    // angular width of each arm's root block (and post)
+arm_rot      = -9;    // turns the ring so the barbs sit at 92/212/332 deg,
+                      // clear of the plugs when the arms bend inward
+root_r_in    = 7.5;   // root blocks thicken inward below the PCB, for stiffness
 arm_ang      = 102;   // angular length of each flexing arm (about 19 mm of arc)
 barb_ang     = 26;    // angular width of the barb at each arm's free end
 
@@ -42,56 +47,54 @@ barb_r_at_wall_min = 15.0;           // face radius at Z = wall_min; minus hole_
                                      // is the preload in the loosest hole
 barb_k             = 0.25;           // face slope, dr/dZ
 barb_tip_z         = wall_max + 0.5; // widest point; must be above wall_max
-lead_in_deg        = 30;             // insertion ramp, degrees from vertical
+lead_in_deg        = 40;             // insertion ramp, degrees from vertical
 
 // ---------------------------------------------------------------------------
-// Pixel PCB v0.1 (from hardware/pixel/pixel.kicad_pcb)
+// Pixel PCB v0.1 (from hardware/pixel/pixel.kicad_pcb), fitted with VERTICAL
+// headers instead of the right-angle ones. They share the same 3-hole pattern,
+// so v0.1 boards can try this layout with hand-soldered headers.
 // ---------------------------------------------------------------------------
 pcb_d = 20.05;     // measured outline; ordered at +/-0.2 mm
 pcb_t = 1.6;
 led_h = 1.6;       // TBD: HL-5050 package height (typical 5050)
 
-// Pin rows of the right-angle headers (bottom side), in model coordinates.
+// Pin rows (bottom side), in model coordinates.
 j1_x = -4.35;      // J1 male, 3 pins at x -6.89 / -4.35 / -1.81
 j2_x =  4.54;      // J2 female, 3 pins at x 2.00 / 4.54 / 7.08
 row_y = 4.0;       // both pin rows are 4 mm north of center
 
-// Header bodies under the board (from the LCSC drawings, see README).
-hdr_t      = 2.54; // body thickness below the board
-j1_body_w  = 7.62;
-j1_face    = 4.4;  // J1 body front face, measured from the pin row
-j1_tip     = 10.4; // J1 pin tips, measured from the pin row
-j2_body_w  = 8.09; // measured sample
-j2_face    = 10.2; // J2 body front face, measured from the pin row
-hdr_back   = 1.27; // body extends this far behind the pin row
+// Vertical header bodies below the board.
+j1_body_w = 7.62;  // male header: plastic body, pins continue below it
+j1_body_h = 2.5;
+j2_body_w = 8.09;  // female socket
+j2_body_h = 5.0;   // TBD: a low-profile 1x3 socket; a standard one is 8.5
+hdr_t     = 2.54;  // header thickness across the row
 
 // ---------------------------------------------------------------------------
 // Servo plugs: SPECULATIVE until the cables arrive (bought 2026-11-07).
-// The plugs mate on pins that sit 1.27 mm below the board, so a plug body
-// thicker than 2.54 mm hits the board. Measure this first.
 // ---------------------------------------------------------------------------
-plug_w = 7.8;      // TBD
-plug_t = 2.54;     // TBD: critical, see above
-plug_l = 14.5;     // TBD: housing length
+plug_w  = 7.8;     // TBD: across the 3 pins
+plug_t  = 2.54;    // TBD: across the row
+plug_l  = 14.5;    // TBD: housing length, both genders
 cable_w = 3.8;     // TBD: flat 3-wire 26 AWG
 cable_t = 1.3;     // TBD
 
+j1_stack = j1_body_h + plug_l;   // board bottom to J1 plug end
+j2_stack = j2_body_h + plug_l;   // board bottom to J2 plug end
+
 // ---------------------------------------------------------------------------
-// Carrier (draft): holds the PCB and plugs under the clip ring.
+// Holder: PCB seat on the posts, plug ends flush with the flange underside.
 // ---------------------------------------------------------------------------
-led_clear  = 0.3;
-pcb_top    = -flange_t - (led_h + led_clear);  // LED tops stay below the arms
-pcb_bot    = pcb_top - pcb_t;
-pocket_r   = 10.35;  // Ø20.7 for a 20.05 +/-0.2 board
-lip_r      = 9.75;   // top-side parts reach r 9.62 (D3)
-ring_or    = 16.6;   // carrier ring outer radius (under the flange)
-plug_gap   = 0.4;    // between plug bottom and cradle floor
-floor_t    = 1.2;
-floor_top  = pcb_bot - plug_t - plug_gap;
-floor_bot  = floor_top - floor_t;
-window_hw  = 10.6;   // half width of the opening for headers and plugs
-rail_w     = 1.2;
-cradle_end = -27;    // how far south the cradle runs
-hook_r_in  = flange_od / 2 + 0.05;
-hook_w     = 1.0;
-hook_ang   = 14;
+pcb_bot = -flange_t + max(j1_stack, j2_stack);
+pcb_top = pcb_bot + pcb_t;
+post_w  = 1.2;     // post radial thickness above the arms (flexes for the snap)
+ledge_r = 9.4;     // ledge under the board's edge at each post
+hook_r  = 9.5;     // hook lip over the board's top edge (parts reach r 9.62
+                   // only at D3, away from the posts)
+hook_t  = 0.9;
+
+tie_dirs   = [0, 90, 180, 270];  // cable exit directions with tie slots
+tie_r      = 15.2;  // slot center radius in the flange
+tie_slot   = [3.0, 1.6];  // radial x tangential
+tie_offset = 5.5;   // slot center distance either side of the cable path
+tie_groove = 1.1;   // depth of the groove that keeps the tie flush on the wall side
