@@ -505,6 +505,11 @@ One printed part, `holder.scad`:
    - D: 1.0 mm arms, 1.0 mm preload in the loosest hole.
 2. Print `test_rings.scad`: four wall stand-ins at Ø24/Ø29 x 3/9 mm. Measure each
    printed bore with calipers.
+
+   Ready-to-print STLs for steps 1 and 2, with print settings, are in
+   `hardware/holder/production/coupon-v0.1/`. Record results in its
+   `MANIFEST.md`. As with the PCB releases, a printed package is never changed;
+   a design change gets a new folder.
 3. For each variant, in each ring:
    - it pushes in by hand;
    - the flange sits tight against the ring;
