@@ -358,6 +358,138 @@ first-class requirement here.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
+### House holder
+
+A 3D-printed holder fits each Pixel PCB into a house's lighting hole. The houses are
+Department 56. Their stock cord holds the bulb with bent spring-steel clips that
+grip the hole's edge.
+
+Draft OpenSCAD: `hardware/holder/` (OpenSCAD 2021.01). Z = 0 is the wall's outer face,
+and +Z points into the house.
+
+#### Measurements
+
+- 2026 notes (7 houses): hole Ø25 - 28 mm, wall 3 - 6 mm. Three bottom-lit houses
+  also have an "inlet" of 12 - 13 mm, which is the depth of the recess around the
+  hole.
+- 2021 spreadsheet (12 houses): wall 4 - 8 mm (8 is the Bakery).
+- The same houses differ between the two years by up to 2 mm (Fezziwig 4 vs 6,
+  Curiosity 5 vs 4). Treat this as measurement noise.
+- The 2021 printed plugs (gcode, reconstructed from the toolpaths):
+  - a Ø32.6 x 2.7 mm flange with a Ø14.4 mm center hole;
+  - a Ø21.9 mm bore for the old 21 mm board;
+  - a tube whose rib narrows from Ø28.4 to about Ø24 over 15 mm, for a total
+    height of 17.6 mm. The rib appears to be a coarse tapered thread, about 6 mm
+    pitch.
+
+  One print fit 11 of 12 houses. Mutton's hole was 1 - 2 mm too small.
+
+#### Requirements
+
+- Holders are temporary. They MUST come out before the houses are packed away and
+  survive yearly insertion and removal.
+- One size MUST fit all houses. At worst, there may be one bottom-lit and one
+  back-lit variant. We cannot measure every Department 56 piece.
+- Design range: hole Ø24 - 29 mm, wall 3 - 9 mm.
+- Bottom-lit houses have a recess around the hole. None is known without one.
+  Everything below the wall MUST fit inside the shallowest recess (12 mm measured)
+  and inside its outline.
+- The holder may reach up to 25 mm into the house.
+- The plugs drive the layout. They lie flat under the board and run south past its
+  edge, to about 15 mm (J1) and 21 mm (J2) from center. That is further than any
+  hole's radius. So the PCB MUST sit at or outside the wall's outer face, never
+  inside the hole. A future PCB with different headers could change this.
+- The plug and cable direction MUST be adjustable after installation: toward the
+  cord notch for bottom-lit houses, and down for back-lit houses.
+- A tug on a cable MUST load the holder, not the headers' solder joints.
+- Print in PETG on the Ender 3 Pro (0.4 mm nozzle), without supports where
+  possible.
+
+#### Design (draft)
+
+Two printed parts:
+
+- **Clip ring** (`clip.scad`): a flange (Ø34 x 2.4 mm, Ø26.4 opening) sits against the outside of
+  the wall. Three arms rise through the hole, each with a barb on its free end.
+  - The arms curve around the axis and flex in the XY plane, so the layer lines
+    never take bending loads.
+  - The hole's inner edge rests on the barb's sloped lower face. The arm springs
+    outward, and the slope turns that into a pull that holds the flange against
+    the wall, for any wall from 3 to 9 mm.
+  - The same slope resists pulling out, but a firm pull removes the holder.
+  - How hard each arm presses depends on how far it is bent, which is set by
+    the hole and the wall: the barb's face radius at the wall's inner edge, minus
+    the hole radius.
+    - Loosest fit: Ø29 hole, 3 mm wall. Only 0.5 mm of preload in the baseline
+      design.
+    - Most bend while installed: Ø24 hole, 9 mm wall, about 4.5 mm.
+    - Insertion: the barb tip must squeeze through Ø24 whatever the wall.
+  - Arms are about 19 mm long. Root strain when squeezed through a 24 mm hole is
+    about 1.8 - 2.2%, which suits PETG.
+  - The arms reach 18 - 20 mm into the house.
+- **Carrier** (`carrier.scad`): holds the PCB and plugs, and snaps onto the clip
+  ring's rim from outside the house.
+  - The rim groove is a full circle, so the carrier swivels to aim the cables.
+  - The PCB goes in from below, LED side up, against a lip at r ≥ 9.75 mm. The
+    top-side parts reach r 9.62 mm.
+  - The plugs lie in a cradle running south, and a cable tie through the floor
+    clamps both cables.
+  - The LED tops stay below the arms, so the arms can flex inward over them.
+    The clearance is only about 0.3 mm (the LED tops are 2.7 mm below the wall
+    face, and the arms start 2.4 mm below it).
+  - The stack below the wall is 10.0 mm, against the 12 mm minimum recess.
+- `pixel_mock.scad` models the board (KiCad courtyards), headers, plugs and
+  cables. `assembly.scad` shows the parts installed in a wall section. Its
+  `check` setting renders the overlap between two parts. All three overlaps come
+  out empty; the clip and carrier only touch, which is intended. The check uses
+  the arms at rest, not bent.
+
+#### Open items
+
+- **TBD:** servo plug dimensions. The model assumes 7.8 x 2.54 x 14.5 mm. The plugs
+  mate on pins 1.27 mm below the board, so a plug thicker than 2.54 mm hits the
+  board. Measure this as soon as the cables arrive (bought 2026-11-07).
+- **TBD:** the LED package height (assumed 1.6 mm).
+- **TBD:** the recess outline. The carrier needs about 36 mm across the hooks and
+  27 mm south of center for the cradle.
+- **TBD:** the light lost to the hole's rim. The LED tops sit about 2.7 mm below
+  the wall's outer face, and the board about 4.3 mm below it.
+- **TBD:** back-lit houses: confirm there is about 10 mm of room behind the wall
+  for the flange and carrier, plus room for the cables to bend.
+- **TBD:** removal. The holder comes out every year, but the carrier's hooks
+  are a shallow detent. A pull on the carrier will probably pop the hooks before
+  the clip ring lets go of the house, leaving a flush flange in a 12 mm recess.
+  Either the carrier joint must hold harder than the clip ring's pull-out force,
+  or the flange needs a pull tab or pry notch. The coupon test can't show this,
+  because there you grab the flange directly.
+- The carrier's hooks and its single PCB retention bump are first guesses. With
+  0.65 mm of clearance around the board, one 0.3 mm bump on the north wall
+  probably won't hold it. Tune both once the clip ring is proven.
+
+#### Test plan
+
+1. Print `coupon.scad`: four clip ring variants, with the letter engraved on the
+   flange.
+   - A: 1.0 mm arms, barb slope 0.25, 0.5 mm preload in the loosest hole (the
+     baseline).
+   - B: 1.2 mm arms (stiffer).
+   - C: 1.0 mm arms, slope 0.4 (more pull-in at thick walls).
+   - D: 1.0 mm arms, 1.0 mm preload in the loosest hole.
+2. Print `test_rings.scad`: four wall stand-ins at Ø24/Ø29 x 3/9 mm. Measure each
+   printed bore with calipers.
+3. For each variant, in each ring:
+   - it pushes in by hand;
+   - the flange sits tight against the ring;
+   - it pulls out without damage.
+4. Check the hardest cases:
+   - Grip: hang the Ø29 x 3 ring (the loosest fit) from the clip ring with a
+     cable's weight, and check that it stays put.
+   - Creep: leave each variant in the Ø24 x 9 ring (the most bend) for a day or
+     more. Check that it still grips the Ø29 x 3 ring afterward.
+   - Wear: insert and remove about 20 times in any ring, and check that the
+     arms still spring back.
+5. Try the best variant in several real houses, both bottom-lit and back-lit.
+
 ### Base station
 
 - For prototyping, we will buy an off-the-shelf WLED controller instead of designing
