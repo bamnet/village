@@ -361,16 +361,21 @@ first-class requirement here.
   WS2814 to the bottom is allowed if the LEDs don't fit otherwise, but it requires
   JLCPCB two-sided (Standard) assembly. Settled in layout: every surface-mount
   part, the WS2814F included, is on the top side.
-- Through-hole header pins and solder joints come out on the LED side. Headers
-  MUST sit near the rim, with a centered keep-out for the LEDs.
-- Headers SHOULD be right-angle, mounted side by side on the bottom, with both
-  pointing the same way (toward the cord notch). The plugs then lie flat under the
-  board. This gives a much lower profile than vertical headers, and both cables
-  already point where they need to go. JLCPCB-assemblable candidates: male C492411
-  and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
-  back to vertical headers. Measured 2026-11-14: at v0.1's spacing the two plugs
-  don't fit side by side (see "Servo plugs and cable" under Physical
-  constraints).
+- Through-hole header pins and solder joints come out on the LED side, so the LEDs
+  and other top-side parts have to leave room for them. (v0.1 put the headers near
+  the rim. v0.2's stacked rows put the pins in the middle; see the House holder
+  section.)
+- Headers SHOULD be vertical, on the bottom, in two stacked rows through the
+  center (see "Feedback for Pixel PCB v0.2" in the House holder section). The
+  plugs then hang straight down through the hole, and the PCB can sit inside the
+  house.
+  - v0.1 used right-angle headers (male C492411, female C2897385) side by side,
+    so the plugs could lie flat under the board. The measured plugs rule that
+    out: at v0.1's spacing they don't fit side by side, and a right-angle female
+    socket can't take the male plug where the board is under it (see "Servo
+    plugs and cable" under Physical constraints).
+  - **TBD:** JLCPCB-assemblable vertical headers for v0.2: a male 1x3, and a
+    standard 8.5 mm female 1x3.
 - Provisional layout (placed and routed, pending real plug dimensions):
   `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
@@ -453,10 +458,168 @@ first-class requirement here.
     record. When an order is placed, fill in the manifest and tag the commit
     `pixel-<version>`. An ordered release is never changed. A design change bumps
     the silkscreen version and gets a new folder.
-  - **TBD:** new header positions for v0.2. The plugs are now measured (see
-    Physical constraints).
+  - v0.1's rows are 8.9 mm apart, too close for both plugs at once (see Physical
+    constraints). v0.2 moves to vertical headers in two stacked rows; see
+    "Feedback for Pixel PCB v0.2" in the House holder section.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
+
+### House holder
+
+A 3D-printed holder fits each Pixel PCB into a house's lighting hole. The house
+measurements and the holder's requirements are in "Physical constraints" (Houses,
+House holder requirements). This section is the design.
+
+Draft OpenSCAD: `hardware/holder/` (OpenSCAD 2021.01). Z = 0 is the wall's outer face,
+and +Z points into the house.
+
+#### Design approach
+
+- The PCB SHOULD sit inside the house, above the wall's inner surface, so the
+  hole's rim doesn't block the light. That calls for vertical headers: the plugs
+  then hang straight down through the hole. (The right-angle-header draft, which
+  kept the PCB outside the wall, is preserved at git tag
+  `holder-right-angle-draft`. Its arms formed a tall tube around the LEDs that
+  passed only about 20% of the light directly.)
+
+#### Design (draft, vertical headers)
+
+One printed part, `holder.scad`:
+
+- **Clip ring** (`clip.scad`): a flange (Ø34 x 2.4 mm, Ø26.4 opening) sits against
+  the outside of the wall. Three arms rise through the hole, each with a barb on
+  its free end.
+  - The arms curve around the axis and flex in the XY plane, so the layer lines
+    never take bending loads.
+  - The hole's inner edge rests on the barb's sloped lower face. The arm springs
+    outward, and the slope turns that into a pull that holds the flange against
+    the wall, for any wall from 3 to 9 mm.
+  - The same slope resists pulling out, but a firm pull removes the holder.
+  - How hard each arm presses depends on how far it is bent, which is set by
+    the hole and the wall: the barb's face radius at the wall's inner edge, minus
+    the hole radius.
+    - Loosest fit: Ø29 hole, 3 mm wall. Only 0.5 mm of preload in the baseline
+      design.
+    - Most bend while installed: Ø24 hole, 9 mm wall, about 4.5 mm.
+    - Insertion: the barb tip must squeeze through Ø24 whatever the wall.
+  - Arms are about 19 mm long. Root strain when squeezed through a 24 mm hole is
+    about 1.8 - 2.2%, which suits PETG.
+  - The arm tops are 15.7 mm into the house (40 degree lead-in).
+- **Posts:** the three arm roots continue up past the arms. Each has a ledge under
+  the PCB's edge and a hook lip over it, so the board snaps in from above, LED
+  side up.
+  - The roots thicken inward (to r 7.5 mm) below the arm tops, to anchor the
+    arms.
+  - The hooks sit where the board's top-side parts leave room.
+- **PCB position:** the board's underside is 20.3 mm into the house and the LED tops
+  are at 23.5 mm (the limit is 25). The ring is turned (`arm_rot = 22`) so the
+  roots and the bent arms clear the plug block.
+- **Plugs:** both hang straight down the middle and end flush with the flange's
+  underside. J2's male plug sets the board height: its sleeve slides over the
+  socket until the mouth meets the board, so it hangs 22.7 mm below the board.
+  J1's plug hangs 16.6 mm (2.5 mm header body + 14.1 mm plug).
+- **Header layout** (`layout` in `params.scad`): the model defaults to the
+  proposed v0.2 "stacked" layout. Two parallel 1x3 rows run east-west through the
+  center: J1 at y = +2.1 mm and J2 at y = -1.525 mm (3.625 mm apart, with
+  0.2 mm between the plugs). The plugs form a 10.25 x 6.45 mm block, with corners
+  within r 6.45 mm. `"v0.1"` and `"side"` (side-by-side rows, centered) are kept
+  for comparison.
+- **Cables:** a cable tie through one of four slot pairs in the flange straps both
+  cables to the flange's underside, pointing toward the cord notch. That holds
+  the plugs on, takes tugs off the headers, and gives a handle to pull the holder
+  out. A groove on the wall side keeps the tie flush.
+- In bottom-lit houses, only the flange (2.4 mm) and the cables' bend sit in the
+  recess.
+- `pixel_mock.scad` models the board (v0.1's KiCad courtyards on the top side,
+  whatever the header layout) with vertical headers, the measured plugs and
+  cables. `assembly.scad` shows the holder installed in a wall section. Its
+  `check` setting renders overlaps:
+  - `holder_mock`: the holder at rest against the board, headers, plugs and
+    cables.
+  - `sweep_mock`: the space the arms sweep through when squeezed through a 24 mm
+    hole, against the same.
+  - `plugs`: the two mated plugs against each other.
+
+  Results (2026-11-14, OpenSCAD 2021.01). The hook lips touching the board's top
+  count as clear:
+
+  | Layout | `arm_rot` | `holder_mock` | `sweep_mock` | `plugs` |
+  |---|---|---|---|---|
+  | stacked, sleeve shifted east (`pm_dx_sign = 1`) | 22 | clear | clear | clear |
+  | stacked, sleeve shifted west (`pm_dx_sign = -1`) | 22 | clear | clear | clear |
+  | side by side, centered (pins 9.4 mm apart) | -9 | 58 mm³ | 62 mm³ | clear |
+  | v0.1 | -9 | 27 mm³ | 97 mm³ | 12 mm³ |
+
+  A 2D search over `arm_rot` (-60 to 60 degrees) found no angle that clears the
+  side-by-side block. The block is 18.6 mm long, its ends reach r 9.3 mm, and
+  three roots 120 degrees apart can't all avoid both ends. By the same 2D
+  estimate, the stacked block keeps at least 0.26 mm of clearance in the 24 mm
+  squeeze, and at least 1.1 mm in the tightest measured house (Ø25, 8 mm wall).
+
+#### Open items
+
+- J2 MUST be a standard 8.5 mm socket, not a low-profile one. The sleeve's mouth
+  reaches the board either way, so a shorter socket doesn't lower the board. It
+  only shortens the pin mate: 8.5 mm takes the pins about 5.4 mm, while 5 mm
+  would take them only about 1.9 mm.
+- **TBD:** the cable bend: two cables turn 90 degrees right under the flange
+  (inside the recess, or behind a back-lit house). The cable (4 x 1.4 mm, bends
+  around a 4 mm rod) should manage it; check in a real recess.
+- **TBD:** the LED package height (assumed 1.6 mm).
+- The post hooks and ledges are first guesses. Tune them once the clip ring is
+  proven. With the board now at 20.3 mm, coupon variant C's arms (top 16.9 mm)
+  would also fit under it.
+
+#### Feedback for Pixel PCB v0.2
+
+- Use vertical headers on the bottom, with a standard 8.5 mm female socket for
+  J2 (see the open items).
+- Put the headers in two stacked rows through the center, as in `params.scad`'s
+  "stacked" layout: both rows east-west and centered on x = 0, J1 (male) at
+  y = +2.1 mm and J2 (female) at y = -1.525 mm (KiCad Y is flipped). Either pin
+  order works. Side-by-side rows can't clear the clip ring's arms (see the
+  check results).
+- The six pin tails then come up through the middle of the top side, in a
+  roughly 5.7 x 4.3 mm patch. The LEDs and U1 have to go around it.
+- Keep a clear ring at the edge of the top side for the hook lips (parts at
+  r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm.
+- Add an orientation feature, such as a notch, flat or small hole at the edge,
+  so the board seats the same way every time.
+- White solder mask, as the 2025 spec asked; v0.1 is green.
+- Center the LED cluster (v0.1's sits about 2.5 mm south of center).
+
+#### Test plan
+
+1. Print `coupon.scad`: four clip ring variants, with the letter engraved on the
+   flange.
+   - A: 1.0 mm arms, barb slope 0.25, 0.5 mm preload in the loosest hole (the
+     baseline).
+   - B: 1.2 mm arms (stiffer).
+   - C: 1.0 mm arms, slope 0.4 (more pull-in at thick walls).
+   - D: 1.0 mm arms, 1.0 mm preload in the loosest hole.
+2. Print `test_rings.scad`: four wall stand-ins at Ø24/Ø29 x 3/9 mm. Measure each
+   printed bore with calipers.
+
+   Ready-to-print STLs for steps 1 and 2, with print settings, are in
+   `hardware/holder/production/coupon-v0.1/`. Record results in its
+   `MANIFEST.md`. As with the PCB releases, a printed package is never changed;
+   a design change gets a new folder.
+3. For each variant, in each ring:
+   - it pushes in by hand;
+   - the flange sits tight against the ring;
+   - it pulls out without damage.
+4. Check the hardest cases:
+   - Grip: hang the Ø29 x 3 ring (the loosest fit) from the clip ring with a
+     cable's weight, and check that it stays put.
+   - Creep: leave each variant in the Ø24 x 9 ring (the most bend) for a day or
+     more. Check that it still grips the Ø29 x 3 ring afterward.
+   - Wear: insert and remove about 20 times in any ring, and check that the
+     arms still spring back.
+5. When the boards arrive, solder vertical headers to one v0.1 board. The plugs
+   are measured (`params.scad` is updated). v0.1's rows are too close for both
+   plugs at once, so test with one cable at a time. Then print `holder.scad`
+   with the best variant's arms. Check the snap-in, the cable tie, the cable bend
+   in a real recess, and the light inside a house.
 
 ### Base station
 
