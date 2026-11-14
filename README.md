@@ -75,6 +75,110 @@ open decisions.
   gives enough slack.
 - The farthest house is no more than 8 ft (2.4 m) from the base station.
 
+### Physical constraints
+
+Measured facts that every design (Pixel PCB, house holder, cabling) has to work
+within. Design choices that follow from them belong in the design sections, not
+here. Current sources are in `reference/`. Older work kept for its dimensions is
+in `archive/`.
+
+#### Houses
+
+- The houses are Department 56. Their stock lamp is a clip-in bulb on a cord, held
+  by bent spring-steel clips that grip the edge of the lighting hole.
+- Some houses have the lighting hole in the back and some in the bottom. For bottom
+  holes, the stock lamp sits in the hole and its cord leaves sideways, flush with
+  the base, through a notch and cord channel in the house base.
+- Measurements:
+  - 2026-11-08 notes, 7 houses (`reference/houses/2026-11-08_house_measurements_notes.pdf`):
+    hole Ø25 - 28 mm, wall 3 - 6 mm. Three bottom-lit houses also have an "inlet"
+    of 12 - 13 mm, which is the depth of the recess around the hole.
+  - 2021 spreadsheet, 12 houses (`reference/houses/2021_house_measurements.xlsx`):
+    wall 4 - 8 mm (8 is the Bakery).
+  - The same houses differ between the two years by up to 2 mm (Fezziwig 4 vs 6,
+    Curiosity 5 vs 4). Treat this as measurement noise.
+  - The 2021 printed light plugs (`archive/2021_light_plug_tapered_v5.gcode` and
+    `archive/2021_light_plug_1001.gcode`), reconstructed from the toolpaths:
+    - a Ø32.6 x 2.7 mm flange with a Ø14.4 mm center hole;
+    - a Ø21.9 mm bore for the old 21 mm board;
+    - a tube whose rib narrows from Ø28.4 to about Ø24 over 15 mm, for a total
+      height of 17.6 mm. The rib appears to be a coarse tapered thread, about
+      6 mm pitch.
+
+    One print fit 11 of 12 houses. Mutton's hole was 1 - 2 mm too small.
+- Design range: hole Ø24 - 29 mm, wall 3 - 9 mm. That is the measured range plus
+  margin, because we cannot measure every Department 56 piece.
+- Anything in the house may reach up to about 25 mm (1 in) past the wall's outer
+  face.
+- Bottom-lit houses have a recess around the hole. None is known without one.
+  Everything below the wall MUST fit inside the shallowest recess (12 mm measured)
+  and inside its outline. **TBD:** the recess outline (width and shape).
+- A daisy-chained house has two cables (in and out). Both MUST fit through the notch
+  and cord channel. Two flat servo cables fit, since a classic 120 V lamp cord
+  does. **TBD:** the notch and channel dimensions.
+- **TBD:** back-lit houses: the room behind the wall for anything outside it,
+  including the cables' bend.
+- The light SHOULD NOT be blocked by the hole's rim or by parts around the LEDs.
+
+#### House holder requirements
+
+A 3D-printed holder fits each Pixel PCB into a house's lighting hole.
+
+- Holders are temporary. They MUST come out before the houses are packed away and
+  survive yearly insertion and removal. Pulling the holder out MUST NOT leave part
+  of it behind in the house.
+- One size MUST fit all houses. At worst, there may be one bottom-lit and one
+  back-lit variant.
+- The cables MUST be able to leave toward the cord notch (bottom-lit) or
+  downward (back-lit).
+- A tug on a cable MUST load the holder, not the headers' solder joints. The
+  plugs MUST NOT slide off their headers, even hanging plug-down.
+- Print in PETG on the Ender 3 Pro (0.4 mm nozzle), without supports where
+  possible.
+
+#### Servo plugs and cable
+
+Measured with calipers on the purchased 3-wire servo extension cables
+(2026-11-14). Photos and a sketch are in `reference/servo_plugs/`.
+
+- Female end: 8.15 x 2.85 x 14.1 mm (width across the pins x thickness x
+  length). It sits flat on the right-angle male header sample, C492411
+  (`female_on_ra_header.jpg`).
+- Male end: 10.25 x 4.0 x 22.7 mm. It is a sleeve that swallows a female housing:
+  9.3 mm of a female housing goes inside.
+  - The 4 mm thickness runs about 17 mm from the mouth. The last 5 mm toward the
+    cable is 2.85 mm thick.
+  - The walls are 0.85 mm. At the signal-wire (orange) end, a 1.4 x 2.2 mm key
+    block fills one corner of the cavity, for a tab that our female plugs don't
+    have (`male_mouth_sketch.jpg`, `male_mouth.jpg`).
+  - The pins are centered across the thickness. Along the width, the keyed end
+    shifts the sleeve about 0.3 mm toward the signal pin.
+  - The pin tips sit 3.0 - 3.2 mm inside the mouth.
+  - It slides over the right-angle female header sample, C2897385, with careful
+    alignment (`male_on_ra_socket_*.jpg`).
+- Two plugs flush side by side, the long way: 18.4 mm. Stacked: 6.9 mm. Both
+  match the sums of the single plugs, so the housings have no give.
+- Cable: 4.0 x 1.4 mm flat. It wraps comfortably around a 4 mm rod.
+
+What follows from these, whatever the design:
+
+- Side by side, two mated plugs need their center pins at least 9.2 mm apart
+  (8.15 / 2 + 10.25 / 2), plus clearance. v0.1's rows are 8.9 mm apart, so both
+  cables can't be plugged into a v0.1 board at once.
+- In two parallel (stacked) rows, the rows need to be at least 3.43 mm apart
+  (2.85 / 2 + 4.0 / 2), plus clearance.
+- On a vertical female socket up to 9.3 mm tall, the male sleeve slides on until
+  its mouth meets the board. The plug then hangs 22.7 mm below the board, whatever
+  the socket's height. A shorter socket only shortens the pin mate, which is the
+  socket height minus 3.1 mm: about 5.4 mm for a standard 8.5 mm socket, and
+  about 1.9 mm for a 5 mm one.
+- On a vertical male header with a 2.5 mm body, the female plug hangs 16.6 mm
+  below the board.
+- On a right-angle female socket lying on the board, the sleeve covers 9.3 mm of
+  the socket's body and has to wrap around its board-side face. Wherever the board
+  is under it, that wall would have to sit inside the PCB. It can only mate where
+  the socket hangs past the board's edge.
+
 ### Light
 
 As a winter village, each house MUST be lit using warm white light. Each house MAY
@@ -159,7 +263,8 @@ first-class requirement here.
   Otherwise the base station needs a stronger line driver.
 - Cables MUST be standard 3-wire RC servo extension cables (JR/Futaba style, 2.54 mm
   pitch), bought ready-made. 1 m male-to-female cables are widely sold. 22 AWG is
-  preferred over 26 AWG for lower voltage drop.
+  preferred over 26 AWG for lower voltage drop. Plug and cable dimensions are in
+  "Servo plugs and cable" under Physical constraints.
 - Boards MUST use 2.54 mm pitch 1x3 headers: male pins for the incoming cable and a
   female socket for the outgoing cable. JLCPCB SHOULD solder these through-hole
   parts (v0.1 headers were hand-soldered; see the Pixel PCB section).
@@ -247,15 +352,8 @@ first-class requirement here.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
-- The lighting hole in the house itself is slightly larger than the holder hole. The
-  hole size is broadly consistent across houses (the original lights are
-  interchangeable). **TBD:** the measured house hole size.
-- Some houses have the lighting hole in the back and some in the bottom. For bottom
-  holes, the original clip-in lamp sits in the hole and its cord leaves sideways,
-  flush with the base, through a notch and cord channel in the house base.
-- For bottom holes, the assembly can extend up to about 1 in (25 mm) into the house.
-- A daisy-chained house has two cables (in and out). Both MUST fit through the notch
-  and cord channel. Two flat servo cables fit, since a classic 120 V lamp cord does.
+- The house measurements (hole Ø25 - 28 mm, wall 3 - 8 mm, recess, 25 mm limit,
+  cord notch) are under "Houses" in Physical constraints.
 - LEDs MUST be on the top side, clustered near the center. Headers (through-hole)
   go on the bottom side.
 - All surface-mount parts, the WS2814 included, SHOULD also go on the top side. That
@@ -270,8 +368,9 @@ first-class requirement here.
   board. This gives a much lower profile than vertical headers, and both cables
   already point where they need to go. JLCPCB-assemblable candidates: male C492411
   and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
-  back to vertical headers. **TBD:** confirm the fit with real servo plugs (the
-  width is estimated at about 8 mm each).
+  back to vertical headers. Measured 2026-11-14: at v0.1's spacing the two plugs
+  don't fit side by side (see "Servo plugs and cable" under Physical
+  constraints).
 - Provisional layout (placed and routed, pending real plug dimensions):
   `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
@@ -284,8 +383,8 @@ first-class requirement here.
   - This relaxes "headers near the rim". The pin rows sit just north of the
     LEDs, and the LED cluster sits about 2.5 mm south of center.
   - The header rows are 8.9 mm apart, center to center. KiCad's stock
-    footprints need at least 8.62 mm, which is slightly more than the estimated
-    8 mm plug width.
+    footprints need at least 8.62 mm. The real plugs need at least 9.2 mm, so
+    both cables can't be plugged in at once (measured 2026-11-14).
   - J1 and J2 use KiCad's stock right-angle footprints. Checked against the LCSC
     drawings on 2026-09-30, and the copper matches:
     - J1, male (XFCN PZ254R-11-03P, C492411): Ø1.02 mm holes and 0.64 mm square
@@ -354,7 +453,8 @@ first-class requirement here.
     record. When an order is placed, fill in the manifest and tag the commit
     `pixel-<version>`. An ordered release is never changed. A design change bumps
     the silkscreen version and gets a new folder.
-  - **TBD:** revisit the header positions once real plugs are measured.
+  - **TBD:** new header positions for v0.2. The plugs are now measured (see
+    Physical constraints).
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
