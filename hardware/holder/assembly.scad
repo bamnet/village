@@ -8,6 +8,7 @@
 //   "holder_mock" - the holder at rest against the board, headers, plugs, cables
 //   "sweep_mock"  - the space the arms sweep through when squeezed through
 //                   hole_min, against the same
+//   "plugs"       - the two mated plugs against each other
 //
 // Note: the cables are drawn bent at a fixed spot under the flange, so cable
 // overlaps there are a drawing artifact; the check below leaves them out.
@@ -44,6 +45,7 @@ module scene() {
 }
 
 if (check == "holder_mock") intersection() { holder(); mock_in_holder(); }
+else if (check == "plugs") intersection() { j1_plug(); j2_plug(); }
 else if (check == "sweep_mock") intersection() { arm_sweep(); mock_in_holder(); }
 else if (cutaway) difference() { scene(); translate([0, -60, -40]) cube([60, 120, 80]); }
 else scene();

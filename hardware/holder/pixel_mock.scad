@@ -1,8 +1,8 @@
 // Mock-up of a Pixel PCB v0.1 fitted with vertical headers and both servo
 // plugs mated, for clearance checks only (not printed). Part outlines are the
 // KiCad courtyards from hardware/pixel/pixel.kicad_pcb, flipped into model
-// coordinates (Y = -KiCad Y). Header, plug and cable sizes are partly
-// SPECULATIVE (see params.scad).
+// coordinates (Y = -KiCad Y), so the top side is always v0.1's even when
+// `layout` moves the headers. Plug and cable sizes are measured (params.scad).
 
 include <params.scad>
 
@@ -25,36 +25,57 @@ module kicad_box(b, z0) {
     translate([b[0], -b[3], z0]) cube([b[2] - b[0], b[3] - b[1], b[4]]);
 }
 
-module hanging_box(x, w, t, z_top, h) {
-    translate([x - w / 2, row_y - t / 2, z_top - h]) cube([w, t, h]);
+module hanging_box(x, y, w, t, z_top, h) {
+    translate([x - w / 2, y - t / 2, z_top - h]) cube([w, t, h]);
+}
+
+// Board, top-side parts and the pin tails on the LED side (~1.5 mm).
+module mock_board() {
+    color("darkgreen") translate([0, 0, pcb_bot]) cylinder(d = pcb_d, h = pcb_t);
+    color("white") for (b = top_parts) kicad_box(b, pcb_top);
+    color("gold") for (p = [[j1_x, j1_y], [j2_x, j2_y]], dx = [-2.54, 0, 2.54])
+        translate([p[0] + dx - 0.32, p[1] - 0.32, pcb_top]) cube([0.64, 0.64, 1.5]);
+}
+
+module mock_headers() {
+    color("black") {
+        hanging_box(j1_x, j1_y, j1_body_w, hdr_t, pcb_bot, j1_body_h);
+        hanging_box(j2_x, j2_y, j2_body_w, hdr_t, pcb_bot, j2_body_h);
+    }
+}
+
+// Female plug on J1's pins.
+module j1_plug() {
+    color("dimgray") hanging_box(j1_x, j1_y, pf_w, pf_t, pcb_bot - j1_body_h, pf_l);
+}
+
+// Male plug's sleeve over J2's socket. The neck's width is not measured, so it
+// is drawn as wide as the sleeve.
+module j2_plug() {
+    j2_mouth = pcb_bot - max(0, j2_body_h - pm_engage);
+    color("dimgray") {
+        hanging_box(j2_x + pm_dx_sign * pm_dx, j2_y, pm_w, pm_t, j2_mouth, pm_sleeve_l);
+        hanging_box(j2_x + pm_dx_sign * pm_dx, j2_y, pm_w, pm_neck_t, j2_mouth - pm_sleeve_l, pm_l - pm_sleeve_l);
+    }
+}
+
+// Cables: straight down out of each plug, then bent outward under the flange
+// toward 270 degrees.
+module mock_cables() {
+    color("red") for (p = [[j1_x, j1_y, j1_stack], [j2_x, j2_y, j2_stack]]) {
+        z_end = pcb_bot - p[2];
+        hanging_box(p[0], p[1], cable_w, cable_t, z_end, z_end + flange_t + 2 + cable_t);
+        translate([p[0] - cable_w / 2, -40, -flange_t - 2 - cable_t])
+            cube([cable_w, 40 + p[1], cable_t]);
+    }
 }
 
 module pixel_mock() {
-    // Board.
-    color("darkgreen") translate([0, 0, pcb_bot]) cylinder(d = pcb_d, h = pcb_t);
-    // Top-side parts.
-    color("white") for (b = top_parts) kicad_box(b, pcb_top);
-    // Header pin tails poking through on the LED side (~1.5 mm).
-    color("gold") for (x = [j1_x - 2.54, j1_x, j1_x + 2.54, j2_x - 2.54, j2_x, j2_x + 2.54])
-        translate([x - 0.32, row_y - 0.32, pcb_top]) cube([0.64, 0.64, 1.5]);
-    // Header bodies.
-    color("black") {
-        hanging_box(j1_x, j1_body_w, hdr_t, pcb_bot, j1_body_h);
-        hanging_box(j2_x, j2_body_w, hdr_t, pcb_bot, j2_body_h);
-    }
-    // Plugs: female onto J1's pins, male into J2's socket.
-    color("dimgray") {
-        hanging_box(j1_x, plug_w, plug_t, pcb_bot - j1_body_h, plug_l);
-        hanging_box(j2_x, plug_w, plug_t, pcb_bot - j2_body_h, plug_l);
-    }
-    // Cables: straight down out of each plug, then bent outward under the
-    // flange toward 270 degrees.
-    color("red") for (p = [[j1_x, j1_stack], [j2_x, j2_stack]]) {
-        z_end = pcb_bot - p[1];
-        hanging_box(p[0], cable_w, cable_t, z_end, z_end + flange_t + 2 + cable_t);
-        translate([p[0] - cable_w / 2, -40, -flange_t - 2 - cable_t])
-            cube([cable_w, 40 + row_y, cable_t]);
-    }
+    mock_board();
+    mock_headers();
+    j1_plug();
+    j2_plug();
+    mock_cables();
 }
 
 pixel_mock();

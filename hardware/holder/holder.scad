@@ -55,6 +55,8 @@ module holder(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min) {
     }
     echo(str("holder: PCB bottom z=", pcb_bot, ", LED tops z=", pcb_top + led_h,
              ", plug ends z=", pcb_bot - max(j1_stack, j2_stack)));
+    echo(str("plugs: layout ", layout, ", J1 at (", j1_x, ", ", j1_y, "), J2 at (", j2_x, ", ", j2_y, ")",
+             ", J2 pin mate=", j2_pin_mate));
 }
 
 holder();

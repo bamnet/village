@@ -361,16 +361,21 @@ first-class requirement here.
   WS2814 to the bottom is allowed if the LEDs don't fit otherwise, but it requires
   JLCPCB two-sided (Standard) assembly. Settled in layout: every surface-mount
   part, the WS2814F included, is on the top side.
-- Through-hole header pins and solder joints come out on the LED side. Headers
-  MUST sit near the rim, with a centered keep-out for the LEDs.
-- Headers SHOULD be right-angle, mounted side by side on the bottom, with both
-  pointing the same way (toward the cord notch). The plugs then lie flat under the
-  board. This gives a much lower profile than vertical headers, and both cables
-  already point where they need to go. JLCPCB-assemblable candidates: male C492411
-  and female C2897385. If two plugs don't fit side by side on the 20 mm board, fall
-  back to vertical headers. Measured 2026-11-14: at v0.1's spacing the two plugs
-  don't fit side by side (see "Servo plugs and cable" under Physical
-  constraints).
+- Through-hole header pins and solder joints come out on the LED side, so the LEDs
+  and other top-side parts have to leave room for them. (v0.1 put the headers near
+  the rim. v0.2's stacked rows put the pins in the middle; see the House holder
+  section.)
+- Headers SHOULD be vertical, on the bottom, in two stacked rows through the
+  center (see "Feedback for Pixel PCB v0.2" in the House holder section). The
+  plugs then hang straight down through the hole, and the PCB can sit inside the
+  house.
+  - v0.1 used right-angle headers (male C492411, female C2897385) side by side,
+    so the plugs could lie flat under the board. The measured plugs rule that
+    out: at v0.1's spacing they don't fit side by side, and a right-angle female
+    socket can't take the male plug where the board is under it (see "Servo
+    plugs and cable" under Physical constraints).
+  - **TBD:** JLCPCB-assemblable vertical headers for v0.2: a male 1x3, and a
+    standard 8.5 mm female 1x3.
 - Provisional layout (placed and routed, pending real plug dimensions):
   `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
@@ -453,9 +458,9 @@ first-class requirement here.
     record. When an order is placed, fill in the manifest and tag the commit
     `pixel-<version>`. An ordered release is never changed. A design change bumps
     the silkscreen version and gets a new folder.
-  - **TBD:** new header positions for v0.2. The plugs are now measured (see
-    Physical constraints), and the house holder now favors vertical headers;
-    see "Feedback for Pixel PCB v0.2" in the House holder section.
+  - v0.1's rows are 8.9 mm apart, too close for both plugs at once (see Physical
+    constraints). v0.2 moves to vertical headers in two stacked rows; see
+    "Feedback for Pixel PCB v0.2" in the House holder section.
 - The connector, the holder, or both SHOULD let the cables make the turn into the
   channel without stressing the connectors or their solder joints.
 
@@ -506,54 +511,76 @@ One printed part, `holder.scad`:
   - The roots thicken inward (to r 7.5 mm) below the arm tops, to anchor the
     arms.
   - The hooks sit where the board's top-side parts leave room.
-- **PCB position:** the board's underside is 17.1 mm into the house and the LED tops
-  are at 20.3 mm, above the thickest wall. The ring is turned (`arm_rot`) so the
-  barbs, which bend inward furthest, point away from the plugs.
+- **PCB position:** the board's underside is 20.3 mm into the house and the LED tops
+  are at 23.5 mm (the limit is 25). The ring is turned (`arm_rot = 22`) so the
+  roots and the bent arms clear the plug block.
 - **Plugs:** both hang straight down the middle and end flush with the flange's
-  underside. J1 (male header, 2.5 mm body + 14.5 mm plug) and J2 (5 mm low-profile
-  socket + 14.5 mm plug) set the board height.
+  underside. J2's male plug sets the board height: its sleeve slides over the
+  socket until the mouth meets the board, so it hangs 22.7 mm below the board.
+  J1's plug hangs 16.6 mm (2.5 mm header body + 14.1 mm plug).
+- **Header layout** (`layout` in `params.scad`): the model defaults to the
+  proposed v0.2 "stacked" layout. Two parallel 1x3 rows run east-west through the
+  center: J1 at y = +2.1 mm and J2 at y = -1.525 mm (3.625 mm apart, with
+  0.2 mm between the plugs). The plugs form a 10.25 x 6.45 mm block, with corners
+  within r 6.45 mm. `"v0.1"` and `"side"` (side-by-side rows, centered) are kept
+  for comparison.
 - **Cables:** a cable tie through one of four slot pairs in the flange straps both
   cables to the flange's underside, pointing toward the cord notch. That holds
   the plugs on, takes tugs off the headers, and gives a handle to pull the holder
   out. A groove on the wall side keeps the tie flush.
 - In bottom-lit houses, only the flange (2.4 mm) and the cables' bend sit in the
   recess.
-- `pixel_mock.scad` models the board (KiCad courtyards) with vertical headers,
-  plugs and cables. `assembly.scad` shows the holder installed in a wall section.
-  Its `check` setting renders overlaps:
+- `pixel_mock.scad` models the board (v0.1's KiCad courtyards on the top side,
+  whatever the header layout) with vertical headers, the measured plugs and
+  cables. `assembly.scad` shows the holder installed in a wall section. Its
+  `check` setting renders overlaps:
   - `holder_mock`: the holder at rest against the board, headers, plugs and
-    cables. Empty; the hook lips only touch the board.
+    cables.
   - `sweep_mock`: the space the arms sweep through when squeezed through a 24 mm
-    hole. It overlaps the east corner of the J2 socket and plug by up to about
-    0.4 mm (0.3 mm³; still about 0.1 mm³ at a 25 mm hole). See the open items.
+    hole, against the same.
+  - `plugs`: the two mated plugs against each other.
+
+  Results (2026-11-14, OpenSCAD 2021.01). The hook lips touching the board's top
+  count as clear:
+
+  | Layout | `arm_rot` | `holder_mock` | `sweep_mock` | `plugs` |
+  |---|---|---|---|---|
+  | stacked, sleeve shifted east (`pm_dx_sign = 1`) | 22 | clear | clear | clear |
+  | stacked, sleeve shifted west (`pm_dx_sign = -1`) | 22 | clear | clear | clear |
+  | side by side, centered (pins 9.4 mm apart) | -9 | 58 mm³ | 62 mm³ | clear |
+  | v0.1 | -9 | 27 mm³ | 97 mm³ | 12 mm³ |
+
+  A 2D search over `arm_rot` (-60 to 60 degrees) found no angle that clears the
+  side-by-side block. The block is 18.6 mm long, its ends reach r 9.3 mm, and
+  three roots 120 degrees apart can't all avoid both ends. By the same 2D
+  estimate, the stacked block keeps at least 0.26 mm of clearance in the 24 mm
+  squeeze, and at least 1.1 mm in the tightest measured house (Ø25, 8 mm wall).
 
 #### Open items
 
-- **TBD:** servo plug dimensions. The model assumes 7.8 x 2.54 x 14.5 mm. The
-  plug lengths set the board height.
-- **TBD:** a low-profile 1x3 female socket for J2, about 5 mm tall. A standard
-  8.5 mm socket raises the board by 3.5 mm, to LED tops at about 23.8 mm (the
-  limit is 25).
-- **TBD:** the arm sweep reaches the J2 corner in 24 - 25 mm holes. v0.1's pin
-  rows are 4 mm north of center, so the plug block's corners sit at r 9.95 - 10.07
-  mm, only 0.3 - 0.45 mm inside the arms. Touching only while pushing in is
-  harmless. But in a small hole the arm stays bent, and its grip would rest
-  partly on the plug instead of the wall. Fix on v0.2 (see the Pixel PCB items
-  below) or by narrowing the plugs' spacing.
+- J2 MUST be a standard 8.5 mm socket, not a low-profile one. The sleeve's mouth
+  reaches the board either way, so a shorter socket doesn't lower the board. It
+  only shortens the pin mate: 8.5 mm takes the pins about 5.4 mm, while 5 mm
+  would take them only about 1.9 mm.
 - **TBD:** the cable bend: two cables turn 90 degrees right under the flange
-  (inside the recess, or behind a back-lit house). Check with real cables.
+  (inside the recess, or behind a back-lit house). The cable (4 x 1.4 mm, bends
+  around a 4 mm rod) should manage it; check in a real recess.
 - **TBD:** the LED package height (assumed 1.6 mm).
 - The post hooks and ledges are first guesses. Tune them once the clip ring is
-  proven. Coupon variant C's arms (top 16.9 mm) are too tall for the current
-  board height; it is in the coupon only to test the barb slope.
+  proven. With the board now at 20.3 mm, coupon variant C's arms (top 16.9 mm)
+  would also fit under it.
 
 #### Feedback for Pixel PCB v0.2
 
-- Keep the vertical headers on the bottom, with a low-profile female socket for
-  J2.
-- Keep the plug block clear of the arms' sweep: every header and plug corner
-  within about r 9.5 mm. For example, move the pin rows about 1 mm toward
-  center.
+- Use vertical headers on the bottom, with a standard 8.5 mm female socket for
+  J2 (see the open items).
+- Put the headers in two stacked rows through the center, as in `params.scad`'s
+  "stacked" layout: both rows east-west and centered on x = 0, J1 (male) at
+  y = +2.1 mm and J2 (female) at y = -1.525 mm (KiCad Y is flipped). Either pin
+  order works. Side-by-side rows can't clear the clip ring's arms (see the
+  check results).
+- The six pin tails then come up through the middle of the top side, in a
+  roughly 5.7 x 4.3 mm patch. The LEDs and U1 have to go around it.
 - Keep a clear ring at the edge of the top side for the hook lips (parts at
   r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm.
 - Add an orientation feature, such as a notch, flat or small hole at the edge,
@@ -588,8 +615,9 @@ One printed part, `holder.scad`:
      more. Check that it still grips the Ø29 x 3 ring afterward.
    - Wear: insert and remove about 20 times in any ring, and check that the
      arms still spring back.
-5. When the boards and cables arrive: solder vertical headers to one v0.1
-   board, measure the plugs, and update `params.scad`. Then print `holder.scad`
+5. When the boards arrive, solder vertical headers to one v0.1 board. The plugs
+   are measured (`params.scad` is updated). v0.1's rows are too close for both
+   plugs at once, so test with one cable at a time. Then print `holder.scad`
    with the best variant's arms. Check the snap-in, the cable tie, the cable bend
    in a real recess, and the light inside a house.
 
