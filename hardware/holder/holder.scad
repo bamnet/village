@@ -1,129 +1,150 @@
-// House holder (v0.2), vertical-header layout. One printed piece, no supports.
+// House holder (v0.3), vertical-header layout. One printed piece, no supports.
 //
-// - The clip ring (clip.scad) grips the lighting hole bore gently with short
-//   XY-flexing arms (no overhang hook).
-// - Three posts rise from the arm roots to hold the Pixel PCB at Z = 16 mm:
-//   two fixed capture slots (angled 45 deg roofs, zero flat overhang) and one
-//   longer south snap-latch (~8.6 mm flex beam, <1% Z-layer strain).
-// - Two stepped C-shaped guide cheeks (anchored to Roots 0 and 1) funnel both
-//   servo plugs blind onto J1 and J2 and mechanically block 1-pin-offset
-//   plugging, while keeping Z = 8.2..16 mm open on the sides so fingers can
-//   pinch J1's housing and J2's protruding tail directly to unplug.
-// - Dual serpentine (S-bend) channels in the south (-Y) flange pull-tab lock
-//   both flat servo cables tool-lessly against tugs (no zip ties).
+// Replaces coupon v0.2's three fragile 2.2 x 1.0 mm posts (which starved under
+// Bowden PETG retractions and snapped across Z-layer lines) with two wide,
+// thick curved C-cradle jaws (`-12..+76` East-North and `+104..+192` West-North,
+// ~2.35 mm radial wall) rising continuously from wide solid pillars (`26.5..63.5`
+// and `146.5..183.5`) fused directly into the C-guide cheeks.
+//
+// - The PCB (with soldered vertical headers) slides horizontally into the open
+//   south (-Y) mouth at Z = 16.0 mm. Because the jaws wrap 12 deg past the X
+//   equator (`mouth chord = 19.76 mm` for the Ø20.05 mm PCB), the jaws flex
+//   ~0.15 mm/side purely in the XY plane along continuous filament loops (0%
+//   Z-layer strain) to click around the PCB's equator into the Ø20.20 mm seat
+//   with zero resting interference. Mating the plugs across Z = 7.1..16.0 pins
+//   the PCB in place.
+// - Both south serpentine cable cleats open directly into the 250..290 deg arm
+//   gap with zero inner wall blocking the cables.
 
 use <clip.scad>
 include <params.scad>
 
-// Fixed capture post (Posts 0 and 1): PCB edge slides in at a slight angle
-// under a 45 deg self-supporting roof (no flat overhang in PETG).
-module fixed_post(top) {
-    slot_clear = 0.20; // vertical slip clearance above pcb_top at r = pcb_d/2
+// Radial cross-section of a curved C-jaw wall from `z_base` up past the PCB,
+// including the 45 deg bottom PCB ledge (`ledge_r`) and 45 deg self-supporting
+// upper capture lip (`hook_r`, zero flat overhang).
+module jaw_profile_2d(z_base) {
     r_pcb = pcb_d / 2;
-    // 45 deg roof passes through (r_pcb, pcb_top + slot_clear).
-    z_roof_outer = (pcb_top + slot_clear) - (arm_r_in - r_pcb);
+    slot_clear = 0.20;
+    z_ledge_bot  = pcb_bot - (jaw_r_pocket - ledge_r);
+    zb           = min(z_base, z_ledge_bot - 0.15);
+    z_roof_outer = (pcb_top + slot_clear) - (jaw_r_pocket - r_pcb);
     z_roof_inner = (pcb_top + slot_clear) + (r_pcb - hook_r);
-    rotate_extrude(angle = arm_root_ang) {
-        // Stiff inward root buttress below the arm tops.
-        translate([root_r_in, -flange_t])
-            square([arm_r_in - root_r_in + 0.02, top + flange_t]);
-        // Post wall up past the PCB.
-        translate([arm_r_in, top - 0.02])
-            square([post_w, z_roof_inner + 0.6 - top + 0.02]);
-        // 45 deg ledge under the board's edge.
-        polygon([
-            [arm_r_in + 0.02, pcb_bot - (arm_r_in - ledge_r)],
-            [arm_r_in + 0.02, pcb_bot],
-            [ledge_r, pcb_bot],
-        ]);
-        // 45 deg upper capture lip (zero flat overhang).
-        polygon([
-            [arm_r_in + 0.02, z_roof_outer],
-            [hook_r, z_roof_inner],
-            [hook_r, z_roof_inner + 0.5],
-            [arm_r_in + 0.02, z_roof_inner + 0.6],
-        ]);
+    z_top        = z_roof_inner + 0.55;
+
+    polygon([
+        [jaw_r_pocket, zb],
+        [jaw_r_out,    zb],
+        [jaw_r_out,    z_top],
+        [hook_r,       z_top],
+        [hook_r,       z_roof_inner],
+        [jaw_r_pocket, z_roof_outer],
+        [jaw_r_pocket, pcb_bot],
+        [ledge_r,      pcb_bot],
+        [jaw_r_pocket, z_ledge_bot],
+    ]);
+}
+
+// One wide structural pillar (`ang_p0 .. ang_p1`, running all the way from the
+// print bed `Z = -flange_t`) that corbels smoothly outward above `z_corbel`
+// into the wide C-jaw (`ang_j0 .. ang_j1`).
+module curved_cradle_jaw(ang_p0, ang_p1, ang_j0, ang_j1, top) {
+    z_corbel = top + 0.75; // >= 0.75 mm clean air gap above flexing clip arms
+    z_ledge_bot = pcb_bot - (jaw_r_pocket - ledge_r);
+    max_span = max(ang_p0 - ang_j0, ang_j1 - ang_p1);
+    deg_per_mm = max_span / (z_ledge_bot - 0.20 - z_corbel);
+    slices = 32;
+
+    union() {
+        // 1. Solid base pillar from bed (`-flange_t`) up to `pcb_bot`, fused
+        //    into the flange at Z <= 0 and thickened inward to `pillar_r_in`.
+        rotate(ang_p0)
+            rotate_extrude(angle = ang_p1 - ang_p0) {
+                translate([pillar_r_in, -flange_t])
+                    square([flange_id / 2 + 2.0 - pillar_r_in, flange_t]);
+                polygon([
+                    [pillar_r_in, -0.02],
+                    [arm_r_out(arm_w), -0.02],
+                    [arm_r_out(arm_w), z_corbel + 0.05],
+                    [jaw_r_out, z_corbel + (jaw_r_out - arm_r_out(arm_w))],
+                    [jaw_r_out, pcb_bot],
+                    [ledge_r, pcb_bot],
+                    [pillar_r_in, pcb_bot - (ledge_r - pillar_r_in)],
+                ]);
+            }
+
+        // 2. Crisp concave PCB groove from `z_ledge_bot - 0.15` up past the PCB
+        //    (single `rotate_extrude`, never `hull()`ed so the slot stays open).
+        rotate(ang_j0)
+            rotate_extrude(angle = ang_j1 - ang_j0)
+                jaw_profile_2d(z_ledge_bot - 0.15);
+
+        // 3. Smoothly hulled solid corbel arch underneath `z_ledge_bot` (pure
+        //    rectangle `[jaw_r_pocket .. jaw_r_out]`, convex so `hull()` is exact!).
+        for (s = [0 : slices - 1]) {
+            a0 = ang_j0 + (ang_j1 - ang_j0) * s / slices;
+            a1 = ang_j0 + (ang_j1 - ang_j0) * (s + 1) / slices;
+            d0 = a0 < ang_p0 ? (ang_p0 - a0) : a0 > ang_p1 ? (a0 - ang_p1) : 0;
+            d1 = a1 < ang_p0 ? (ang_p0 - a1) : a1 > ang_p1 ? (a1 - ang_p1) : 0;
+            zb0 = min(z_ledge_bot - 0.15, z_corbel + d0 / deg_per_mm);
+            zb1 = min(z_ledge_bot - 0.15, z_corbel + d1 / deg_per_mm);
+            hull() {
+                rotate(a0)
+                    rotate_extrude(angle = 0.12)
+                        translate([jaw_r_pocket, zb0])
+                            square([jaw_r_out - jaw_r_pocket, z_ledge_bot - zb0]);
+                rotate(a1 - 0.12)
+                    rotate_extrude(angle = 0.12)
+                        translate([jaw_r_pocket, zb1])
+                            square([jaw_r_out - jaw_r_pocket, z_ledge_bot - zb1]);
+            }
+        }
     }
 }
 
-// Flexible snap-latch post (Post 2, south): thinner 8.6 mm tall beam flexes
-// outward (<1% Z-layer strain) as the PCB clicks down flat onto the ledge.
-module latch_post(top) {
-    r_pcb = pcb_d / 2;
-    slot_clear = 0.08; // light snug fit on the snap latch
-    z_bevel_outer = (pcb_top + slot_clear) - (arm_r_in + 0.02 - r_pcb);
-    z_bevel_inner = (pcb_top + slot_clear) + (r_pcb - (hook_r + 0.05));
-    rotate_extrude(angle = arm_root_ang) {
-        translate([root_r_in, -flange_t])
-            square([arm_r_in - root_r_in + 0.02, top + flange_t]);
-        translate([arm_r_in, top - 0.02])
-            square([latch_post_w, pcb_top + hook_t - top + 0.02]);
-        // 45 deg ledge under the board's edge.
-        polygon([
-            [arm_r_in + 0.02, pcb_bot - (arm_r_in - ledge_r)],
-            [arm_r_in + 0.02, pcb_bot],
-            [ledge_r, pcb_bot],
-        ]);
-        // Snap hook with 45 deg underside bevel (printable) and top lead-in ramp.
-        polygon([
-            [arm_r_in + 0.02, z_bevel_outer],
-            [hook_r + 0.05, z_bevel_inner],
-            [hook_r + 0.05, z_bevel_inner + 0.20],
-            [arm_r_in + 0.02, pcb_top + hook_t],
-        ]);
-    }
-}
-
-// 2D cross-section of the stepped J1/J2 inner plug pocket, expanded by `extra`
-// (used for the bottom 45 deg entry funnel).
+// 2D cross-section of the stepped J1/J2 inner plug pocket (validated smooth fit).
 module plug_pocket_2d(extra = 0) {
-    // J1 (+Y) pocket.
     translate([-(guide_j1_hw + extra), 0])
         square([2 * (guide_j1_hw + extra), guide_y_n + extra]);
-    // J2 (-Y) pocket.
     translate([-(guide_j2_hw + extra), guide_y_s - extra])
         square([2 * (guide_j2_hw + extra), -guide_y_s + extra + 0.9]);
 }
 
-// Stepped C-shaped guide cheeks on +/-X, anchored into Roots 0 and 1.
+// Stepped C-shaped guide cheeks on +/-X, anchored broadly into the two wide
+// pillars (`26.5..63.5` East-North-East and `146.5..183.5` West).
 module plug_guide_cheeks() {
     h_tot = guide_top_z + flange_t;
-    wall_t = 1.50;   // thick enough that 0.65 mm bottom funnel leaves >=0.85 mm on Layer 1
-    funnel_h = 0.65; // 45 deg bottom lead-in chamfer height
+    wall_t = 1.50;
+    funnel_h = 0.65;
 
     difference() {
         translate([0, 0, -flange_t])
             linear_extrude(h_tot) {
                 union() {
-                    // Constant-thickness wall around plug_pocket_2d, clipped to
-                    // r <= 8.15 mm so outer SW/SE corners stay clear of arm sweep.
                     intersection() {
                         circle(r = 8.15);
                         difference() {
                             offset(r = wall_t) plug_pocket_2d(0);
-                            // Open +Y and -Y center windows for sightlines & cables.
                             translate([-guide_open_n, 0])
                                 square([2 * guide_open_n, guide_y_n + 3]);
                             translate([-guide_open_s, guide_y_s - 3])
                                 square([2 * guide_open_s, -guide_y_s + 3]);
                         }
                     }
-                    // Anchor webs from the NE and NW corners into Roots 0 and 1.
-                    for (ang = [arm_rot + arm_root_ang / 2,
-                                arm_rot + 120 + arm_root_ang / 2])
-                        hull() {
-                            rotate(ang) translate([root_r_in + 0.4, 0]) circle(d = 2.4);
-                            translate([sign(cos(ang)) * (guide_j1_hw + 0.70),
-                                       guide_y_n + 0.50])
-                                circle(d = 1.5);
-                        }
+                    // Thick anchor webs tying East cheek into Pillar E (`44 deg`)
+                    // and West cheek into Pillar W (`172 deg`).
+                    hull() {
+                        rotate(44) translate([pillar_r_in + 0.5, 0]) circle(d = 3.2);
+                        translate([guide_j1_hw + 0.70, guide_y_n + 0.45]) circle(d = 2.0);
+                    }
+                    hull() {
+                        rotate(172) translate([pillar_r_in + 0.5, 0]) circle(d = 3.2);
+                        translate([-(guide_j1_hw + 0.70), 1.2]) circle(d = 2.2);
+                    }
                 }
             }
-        // Inner plug clearance pocket.
         translate([0, 0, -flange_t - 0.1])
             linear_extrude(h_tot + 0.2)
                 plug_pocket_2d(0);
-        // 45 deg bottom lead-in funnel so plugs self-center from underneath.
         hull() {
             translate([0, 0, -flange_t - 0.05])
                 linear_extrude(0.05) plug_pocket_2d(funnel_h);
@@ -135,17 +156,21 @@ module plug_guide_cheeks() {
 
 module holder(w = arm_w, rc = crown_r_def, label = "") {
     top = arm_top(w, rc);
-    assert(top + 1.0 <= pcb_bot, "PCB sits too close to the arm tops");
+    assert(top + 1.5 <= pcb_bot, "PCB sits too close to the arm tops");
     assert(pcb_top + led_h <= inside_max, "LEDs reach too far into the house");
 
-    union() {
-        clip_ring(w = w, rc = rc, label = label, with_tab = true, with_cleats = true);
-        for (i = [0 : arm_n - 1])
-            rotate(arm_rot + i * 360 / arm_n)
-                if (i == 2) latch_post(top);
-                else fixed_post(top);
-        if (layout == "stacked")
-            plug_guide_cheeks();
+    difference() {
+        union() {
+            clip_ring(w = w, rc = rc, label = label, with_tab = true, with_cleats = false);
+            // East-North C-jaw: 37 deg solid pillar (`26.5..63.5`) fanning to `-12..+76`.
+            curved_cradle_jaw(26.5, 63.5, -12, 76, top);
+            // West-North C-jaw: 37 deg solid pillar (`146.5..183.5`) fanning to `+104..+192`.
+            curved_cradle_jaw(146.5, 183.5, 104, 192, top);
+            if (layout == "stacked")
+                plug_guide_cheeks();
+        }
+        // Subtract south cable cleats at top level so nothing ever blocks them!
+        south_cable_cleats();
     }
 
     echo(str("holder ", label, ": PCB bot z=", pcb_bot, ", LED tops z=", pcb_top + led_h,

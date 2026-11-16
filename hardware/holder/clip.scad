@@ -1,13 +1,11 @@
-// Clip ring (v0.2): the part that fits into the house's lighting hole.
+// Clip ring (v0.3): the part that fits into the house's lighting hole.
 //
-// A flange sits against the outside of the wall, with a small south (-Y) tab
+// A flange sits against the outside of the wall, with a south (-Y) pull-tab
 // pointing toward the cord notch. Three short XY-flexing arms rise into the
 // hole, each carrying a smooth cylindrical bore-contact crown inside Z = 1.4..4.4
-// mm (below wall_min's inner edge on thin walls, inside the bore on thick walls).
-// Print flange down in PETG, no supports.
-//
-// holder.scad builds the full holder on top of this. Render this file on its
-// own to see a single clip ring.
+// mm. `arm_rot = 50` aligns the 40 deg open gap across 250..290 deg (-Y south)
+// so both serpentine cable channels open straight into the central bore with
+// zero inner wall blocking the cables. Print flange down in PETG, no supports.
 
 include <params.scad>
 
@@ -28,7 +26,6 @@ function tip_advance_deg(w = arm_w, rc = crown_r_def, hole_d = hole_min) =
 module crown_profile(w, rc) {
     r_out = arm_r_out(w);
     z_bot = crown_bot_z(rc);
-    // Continue the 45 deg underside below Z = 0 until it meets r_out.
     z_start = -(crown_z0_r - r_out);
     top = arm_top(w, rc);
     polygon([
@@ -61,23 +58,20 @@ module flange(with_tab = true) {
         translate([0, 0, -flange_t])
             linear_extrude(flange_t)
                 flange_2d(with_tab);
-        // 45 deg bottom finger-pinch chamfer around the central bore (Z = -flange_t
-        // up by 1.3 mm) so J2's plug housing is even easier to pinch and elephant's
-        // foot never narrows the opening.
+        // 45 deg bottom finger-pinch chamfer around the central bore.
         translate([0, 0, -flange_t - 0.01])
             cylinder(d1 = flange_id + 2.6, d2 = flange_id, h = 1.31);
     }
 }
 
-// Cross-section of one edgewise serpentine cable slot (extruded along its path
-// via hull() of thin slices). Flat on the bed with a 45 deg entry chamfer,
-// vertical side walls, and a 45 deg peaked self-supporting roof.
-module cleat_slice_3d(x, y, w = cleat_w, z_shift = 0) {
+// Cross-section of one edgewise serpentine cable slot. Flat on the bed with a
+// 45 deg entry chamfer, vertical side walls, and a 45 deg peaked roof.
+module cleat_slice_3d(x, y, w = cleat_w) {
     hw = w / 2;
-    ch = 0.45; // bottom 45 deg lead-in chamfer
+    ch = 0.45;
     z_bed = -flange_t - 0.02;
-    z_wall_top = -flange_t + cleat_h_wall + z_shift;
-    z_peak = min(-0.55, z_wall_top + hw); // keep >=0.55 mm solid roof at Z = 0
+    z_wall_top = -flange_t + cleat_h_wall;
+    z_peak = min(-0.55, z_wall_top + hw);
     translate([x, y, 0])
         rotate([90, 0, 0])
             linear_extrude(0.35, center = true)
@@ -93,11 +87,20 @@ module cleat_slice_3d(x, y, w = cleat_w, z_shift = 0) {
 }
 
 // Dual parallel serpentine (S-bend) cable channels in the south (-Y) pull-tab.
-// Both channels wave in unison so the center divider stays wide and uniform.
-module south_cable_cleats(slot_w = cleat_w, steps = 22) {
-    y0 = -flange_id / 2 - 0.3; // -13.0: meets the 45 deg bore chamfer cleanly, clear of Root 2
-    y1 = tab_y_end - 0.4;      // -21.9: exits cleanly out the south tip
+// Starts at y = -11.2 (well inside the Ø25.4 central bore, right through the
+// 250..290 deg open gap) with a flared entry horn so zero inner wall blocks the
+// cables and both S-curves engage along their full height.
+module south_cable_cleats(slot_w = cleat_w, steps = 28) {
+    y_horn = -11.0;        // inside the bore (`r = 12.7` chord at x=3.7 is y=-12.15)
+    y0     = -12.6;        // start of the sinusoidal S-wave
+    y1     = tab_y_end - 0.4; // -24.6: exits cleanly out the south tip
     for (side = [-1, 1]) {
+        // Flared straight lead-in horn breaking cleanly through the inner bore wall.
+        hull() {
+            cleat_slice_3d(side * cleat_x, y_horn, slot_w + 0.55);
+            cleat_slice_3d(side * cleat_x, y0, slot_w);
+        }
+        // Full 1.33-wave S-channel out the south tip (engages both curves fully).
         for (i = [0 : steps - 1]) {
             ya = y0 + (y1 - y0) * i / steps;
             yb = y0 + (y1 - y0) * (i + 1) / steps;
@@ -130,16 +133,15 @@ module clip_ring(w = arm_w, rc = crown_r_def, label = "", rot = arm_rot,
         union() {
             flange(with_tab = with_tab);
             for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n) {
-                // Root block: ties the arm solidly into the flange right from Layer 1
-                // (reaches past the 1.3 mm bottom bore chamfer).
+                // Root block: ties the arm solidly into the flange right from Layer 1.
                 rotate_extrude(angle = arm_root_ang) {
                     translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
                     translate([arm_r_in, -flange_t])
                         square([flange_id / 2 + 2.0 - arm_r_in, flange_t]);
                 }
-                // Flexing arm (free of the flange; radial gap separates them).
-                rotate(arm_root_ang)
-                    rotate_extrude(angle = arm_ang)
+                // Flexing arm (overlaps root by 0.2 deg so CGAL never splits the seam).
+                rotate(arm_root_ang - 0.2)
+                    rotate_extrude(angle = arm_ang + 0.2)
                         translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
                 // Bore-contact crown near the free end.
                 rotate(arm_root_ang + arm_ang - crown_ang)
@@ -162,13 +164,12 @@ module clip_ring(w = arm_w, rc = crown_r_def, label = "", rot = arm_rot,
              round(arm_strain(w, rc, hole_min) * 1000) / 10, "%"));
 }
 
-// Space the arms sweep through when squeezed through `hole_d` (for clearance
-// checks, not printing).
+// Space the arms sweep through when squeezed through `hole_d`.
 module arm_sweep(w = arm_w, rc = crown_r_def, rot = arm_rot,
                  hole_d = hole_sweep, steps = 20) {
     d = crown_bend(rc, hole_d);
     top = arm_top(w, rc);
-    function defl(x) = d * x * x * (3 - x) / 2;   // x = 0 at root, 1 at tip
+    function defl(x) = d * x * x * (3 - x) / 2;
     for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n + arm_root_ang) {
         for (s = [0 : steps - 1]) {
             a0 = arm_ang * s / steps;

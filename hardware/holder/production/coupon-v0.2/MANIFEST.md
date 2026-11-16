@@ -1,8 +1,9 @@
 # House holder coupon v0.2: print package
 
-Status: **ready to print** (rendered and sliced 2026-11-16). Do not change the
-STLs once printed. A design change gets a new folder (`coupon-v0.3`, or
-`holder-v0.1` for production holders).
+Status: **printed & tested 2026-11-16. Clip ring succeeded (`M` and `L` fit all
+tested houses from Ø25 to Ø28); upper PCB posts on `M` snapped in handling and
+inner wall partially blocked S-cleats.** See [Results](#results). Do not change
+the STLs. Follow-up fixes are in `coupon-v0.3`.
 
 Purpose: verify both (1) the gentle bore-friction clip sizing (`S`, `M`, `L`)
 across the measured Ø25 - 28 mm house range and (2) the full v0.2 upper
@@ -109,4 +110,55 @@ only if hotend PID was reset), with two updates:
 
 ## Results
 
-*(Record measured bores, fit, and connector/cleat notes here after printing.)*
+Tested 2026-11-16.
+
+### Clip fit (test rings & real houses)
+
+- All three variants (`S`, `M`, `L`) pushed straight into the printed v0.2 test
+  rings.
+- Real house checks across the envelope:
+
+  | House | Measured hole / wall | `S` (Ø27.3) | `M` (Ø28.7) | `L` (Ø29.2) |
+  |---|---|---|---|---|
+  | Six Jolly Fellowship Porters | Ø25 mm / 4.5 mm (13 mm bottom recess) | Fits | Fits | Fits |
+  | Curiosity Shop | Ø26 mm / 4 mm (back-lit) | Stayed in | Stayed in | Stayed in |
+  | Yankee Candle Shop | Ø27 mm / 6 mm (12 mm bottom recess) | Fits | Fits | Fits |
+  | Partridge and Pear | Ø28 mm / 3 mm (13 mm bottom recess) | Loose (did not stay put) | Secure after slight rotation | Stayed put |
+
+- **Takeaway:** both `M` (Ø28.7) and `L` (Ø29.2) cover the entire `Ø25 - 28 mm`
+  house range as a **single universal size** without needing two separate clip
+  rings. Setting the standard crown to `Ø29.0 mm` (`crown_r_u = 14.50`) gives
+  firmer retention in `Ø28` houses while keeping `Ø25` insertion easy.
+
+### Upper PCB posts, guide cheeks & south cable cleats (`Holder M`)
+
+- **Upper PCB posts (failed):** two of the three narrow `2.2 x 1.0 - 1.2 mm`
+  posts above `Z = 9.0 mm` snapped at the `Z = 9.0 mm` step during handling
+  before the Mock PCB disk could be installed:
+  - `results/holder_m_snapped_posts_bed.jpg`
+  - `results/holder_m_snapped_posts_side.jpg`
+
+  Above the clip ring, the print reduced to three `2.2 mm²` islands spaced
+  `18 mm` apart. `5 mm` Bowden PETG retractions starved and strung the starts
+  of those tiny `~0.3 s` loops right at the `Z = 9.0 mm` step, leaving weak
+  Z-layer necks.
+- **Stepped `C`-cheek plug guide (passed):** both the male (`J2`) and female
+  (`J1`) servo connector housings slid smoothly through the stepped `C`-cheek
+  guide pocket without binding.
+- **South serpentine `S`-cleats (needs inner entry cleared):** the `1.70 mm`
+  slot width felt right on the `4.0 x 1.4 mm` servo cable, but starting the
+  channels at `y = -13.0 mm` (plus placing Root 2 at `262 - 274°`) left an inner
+  wall blocking the bore-side mouth, forcing the cable upward so it barely
+  engaged the second curve.
+
+### Carry into `coupon-v0.3`
+
+- Replace the three skinny Z-bending posts with **two wide, thick (`~2.35 mm`
+  wall) curved `C`-cradle jaws** rising smoothly from `37°` solid pillars (no
+  tiny islands, zero Z-layer bending; PCB slides horizontally in from `-Y` with
+  `~0.15 mm/side` XY-plane snap).
+- Rotate `arm_rot` to `50°` so the `40°` open arm gap sits directly across
+  `250 - 290°` (`-Y` south), cut the serpentine channels all the way through
+  into the central bore (`y = -11.0 mm`) with a flared entry horn, and extend
+  the south tab `2.7 mm` (`y = -24.2 mm`) so both `S`-curves engage cleanly.
+- Use `Ø29.0 mm` (`crown_r_u = 14.50`) as the single universal clip size.
