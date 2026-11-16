@@ -64,6 +64,8 @@ else if (check == "sweep_mock")
         union() {
             mock_in_holder();
             if (layout == "stacked") plug_guide_cheeks();
+            curved_cradle_jaw(26.5, 63.5, -12, 76, arm_top(arm_w, rc_test));
+            curved_cradle_jaw(146.5, 183.5, 104, 192, arm_top(arm_w, rc_test));
         }
     }
 else if (cutaway)

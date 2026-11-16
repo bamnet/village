@@ -131,10 +131,10 @@ A 3D-printed holder fits each Pixel PCB into a house's lighting hole.
   the PCB stays mounted in its holder for storage). Plugging and unplugging MUST be
   easy by gripping the connector housings, without pulling on the wires or cutting
   cable ties. Pulling the holder out MUST NOT leave part of it behind in the house.
-- Up to two clip-ring diameters (`S` and `L`, sharing the same upper PCB/connector
-  structure) MAY be used across the measured Ø25 - 28 mm houses if a single universal
-  size (`M`) needs too much insertion force. Heavy retention grip is not needed;
-  light bore friction (with tape as an optional backup on loose outliers) suffices.
+- One universal clip diameter (`Ø29.0 mm` bore crown, proven across measured
+  Ø25 - 28 mm houses in coupon v0.2; `S` and `L` retained as parameterized options
+  for outliers) fits the fleet. Heavy retention grip is not needed; light bore
+  friction (with tape as an optional backup on loose outliers) suffices.
 - The cables MUST be able to leave toward the cord notch (bottom-lit) or
   downward (back-lit).
 - A tug on a cable MUST load the holder, not the headers' solder joints. The
@@ -488,53 +488,48 @@ and +Z points into the house.
   `holder-right-angle-draft`. Its arms formed a tall tube around the LEDs that
   passed only about 20% of the light directly.)
 
-#### Design (v0.2 draft, vertical headers)
+#### Design (v0.3 draft, vertical headers)
 
 One printed part, `holder.scad` (printed flange down in PETG, zero supports):
 
 - **Clip ring** (`clip.scad`): a flange (Ø34 x 3.8 mm, Ø25.4 opening, with a rounded
-  south pull-tab reaching y = -21.5 mm) sits against the outside of the wall. Three
-  short arms (`arm_w = 0.84 mm`, `arm_ang = 72°`, leaving a `36°` gap so tips never
+  south pull-tab reaching `y = -24.2 mm`) sits against the outside of the wall. Three
+  short arms (`arm_w = 0.84 mm`, `arm_ang = 66°`, leaving a `40°` gap so tips never
   collide) flex in the XY plane so layer lines never take bending loads.
-  - Instead of v0.1's tall overhang barb (which coupled wall thickness into diameter
-    and twisted the arms), each arm carries a smooth cylindrical **bore-contact
-    crown** inside `Z = 1.4 .. 4.4 mm` (`34°` insertion ramp, `arm_top = 8.0 .. 9.4 mm`).
-  - Its `45°` print underside finishes below `wall_min` (`3.0 mm`), so it never hooks
-    behind a thin ceramic rim on removal; light radial friction against the unglazed
-    bore holds the holder across any `3 - 8.5 mm` wall.
-  - Three crown sizes are parameterized (`S`: Ø27.3 for Ø25 - 26.5 holes; `M`: Ø28.7
-    single-size candidate; `L`: Ø29.2 for Ø26.5 - 28.3 holes). Root strain at Ø25 is
-    `0.8 - 1.4%`.
-- **Posts & PCB seat:** three posts continue up from the arm roots (`arm_rot = 22°`)
-  to seat the PCB at `Z = 16.0 mm` (LED tops at `19.2 mm`, well above an `8 mm` wall
-  and inside the `25 mm` limit):
-  - Two north posts (`22°`, `142°`) have fixed capture slots with `45°` self-supporting
-    upper roofs (zero flat mid-air overhang).
-  - The south post (`262°`) is a `1.0 mm` thick, `8.6 mm` tall snap-latch (`< 1%`
-    Z-layer strain, vs. `4.5%` in v0.1). The PCB slides under the two north lips at a
-    slight angle and clicks down past the south latch, staying in the holder for
-    off-season storage.
-- **Plugs & blind-mate guide cheeks:** lowering `pcb_bot` from `20.3` to `16.0 mm`
-  lets J2's `22.7 mm` male plug protrude `2.9 mm` below the flange (`Z = -6.7 mm`, plus
-  a `1.3 mm` bottom bore chamfer = `4.2 mm` exposed to pinch) while leaving `Z = 8.2 ..
-  16.0 mm` open on the sides so fingers can pinch J1's housing (`Z = -0.6 .. 13.5 mm`)
-  directly when unplugging outside the house.
-  - Two stepped C-shaped guide cheeks (`Z = -3.8 .. 8.2 mm`, anchored into the two
-    north roots with a `45°` bottom entry funnel) align both plugs blind onto J1/J2
-    past the `Z = 7.5 mm` pin/socket mating plane, absorb sideways cable tugs, and
-    mechanically block `1`-pin-offset (`2.54 mm`) mis-plugging.
+  - Each arm carries a smooth cylindrical **bore-contact crown** (`Ø29.0 mm`
+    universal default, `Z = 2.25 .. 4.4 mm`, `34°` insertion ramp, `arm_top = 9.2 mm`).
+    Its `45°` print underside finishes below `wall_min` (`3.0 mm`), so it never hooks
+    behind a thin ceramic rim on removal.
+  - `arm_rot = 50°` places the `40°` open gap symmetrically across `250 .. 290°`
+    (`-Y` south), giving both south cable cleats a completely unobstructed entry from
+    the central bore.
+- **Curved `C`-cradle jaws (PCB seat):** two wide, thick (`~2.35 mm` radial wall)
+  curved jaws (`-12 .. +76°` East-North and `+104 .. +192°` West-North) rise smoothly
+  from `37°` solid pillars (`26.5 .. 63.5°` and `146.5 .. 183.5°`, fused into the
+  flange and guide cheeks) to seat the PCB at `Z = 16.0 mm` (LED tops at `19.2 mm`):
+  - Eliminates v0.2's three `2.2 x 1.0 mm` isolated posts (which starved under Bowden
+    PETG retractions and snapped across Z-layer lines).
+  - Because both jaws wrap `12°` past the X equator (`19.76 mm` mouth chord for the
+    `Ø20.05 mm` PCB), sliding the PCB horizontally into the wide-open south (`-Y`)
+    mouth flexes the jaws `~0.15 mm/side` **in the XY plane along continuous filament
+    loops** (`0%` Z-layer bending strain) until it clicks into the `Ø20.20 mm` seat.
+- **Plugs & blind-mate guide cheeks:** at `pcb_bot = 16.0 mm`, J2's `22.7 mm` male
+  plug protrudes `2.9 mm` below the flange (`Z = -6.7 mm`, `4.2 mm` exposed with bore
+  chamfer) while leaving the south front (`192 .. 348°`) and north slot (`76 .. 104°`)
+  open above `Z = 7.1 mm` so fingers can pinch J1's housing directly when unplugging.
+  - Two stepped C-shaped guide cheeks (`Z = -3.8 .. 7.1 mm`, `0.4 mm` below the bare
+    soldered `Z = 7.5 mm` headers so a soldered PCB slides horizontally in from `-Y`)
+    align both plugs blind onto J1/J2, block `1`-pin-offset (`2.54 mm`) mis-plugging,
+    and pin the PCB in place once mated.
 - **Header layout** (`layout` in `params.scad`): defaults to `"stacked"` (J1 at
   `y = +2.1 mm`, J2 at `y = -1.525 mm`, `10.25 x 6.45 mm` block).
-- **Tool-less cable cleat:** the south (`-Y`) pull-tab houses two parallel serpentine
-  (S-bend) edgewise slots (`1.70 mm` wide, `45°` peaked self-supporting roofs) that
-  lock both `4.0 x 1.4 mm` flat servo cables against tugs without zip ties. Cables
-  press in from underneath with a thumb and peel out in a second during annual
-  teardown. Everything below the wall (flange `3.8 mm`, J2 tip at `-6.7 mm`, gentle
-  cable bend to `~-9.5 mm`) stays inside the `12 mm` bottom-lit recess.
+- **Tool-less cable cleat:** the extended south (`-Y`) pull-tab (`y = -24.2 mm`)
+  houses two parallel serpentine (`S`-bend) edgewise slots (`1.68 mm` wide, `45°`
+  peaked roofs) that cut cleanly through into the central bore (`y = -11.0 mm`) via a
+  flared horn so both `S`-curves engage along their full height without zip ties.
 - `pixel_mock.scad` models the board, vertical headers, and measured plugs.
-  `assembly.scad` checks overlaps (`holder_mock`, `sweep_mock` including the guide
-  cheeks at a `24.5 mm` squeeze, and `plugs`): all four checks report empty (`0 mm³`
-  overlap) for both `pm_dx_sign = +1` and `-1`.
+  `assembly.scad` checks overlaps (`holder_mock`, `sweep_mock` including guide cheeks
+  and cradle pillars at `24.5 mm`, and `plugs`).
 
 #### Open items
 
@@ -542,8 +537,9 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
   reaches the board either way, so a shorter socket doesn't lower the board. It
   only shortens the pin mate: 8.5 mm takes the pins about 5.4 mm, while 5 mm
   would take them only about 1.9 mm.
-- **TBD:** verify the serpentine cable cleat grip and the cable bend inside a real
-  `12 mm` bottom-lit house recess using `coupon-v0.2`'s Holder `M`.
+- **TBD:** verify the unobstructed full-wave serpentine cable cleat grip, horizontal
+  PCB slide-in, and cable bend inside a real `12 mm` bottom-lit house recess using
+  `coupon-v0.3`.
 - **TBD:** the LED package height (assumed 1.6 mm).
 
 #### Feedback for Pixel PCB v0.2
@@ -557,7 +553,7 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
 - The six pin tails then come up through the middle of the top side, in a
   roughly 5.7 x 4.3 mm patch. The LEDs and U1 have to go around it.
 - Keep a clear ring at the edge of the top side for the hook lips (parts at
-  r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm.
+  r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm (clear of the south-open C-jaws).
 - Add an orientation feature, such as a notch, flat or small hole at the south edge,
   so the board seats the same way every time.
 - White solder mask, as the 2025 spec asked; v0.1 is green.
@@ -569,29 +565,23 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
    tested four tall curved-barb rings (`A - D`) against `24/29 x 3/9 mm` rings. No
    variant pushed straight in by hand; curved `102°` arms jammed into adjacent roots
    and twisted. Full notes and photos are in `coupon-v0.1/MANIFEST.md`.
-2. **Coupon v0.2 (`hardware/holder/production/coupon-v0.2/`):** one compact `2 x 2`
-   plate (`coupon.scad`) plus bore-compensated gauge rings (`test_rings.scad`,
-   `25 / 26.5 / 28 x 4.5 mm` and `26.5 x 8.1 mm`):
-   - **Ring `S`:** clip ring only, Ø27.3 mm bore pad (for Ø25.0 - 26.5 mm holes).
-   - **Ring `L`:** clip ring only, Ø29.2 mm bore pad (for Ø26.5 - 28.3 mm holes).
-   - **Holder `M`:** full v0.2 holder with Ø28.7 mm universal-candidate bore pad,
-     2-fixed/1-latch PCB seat, blind-mate J1/J2 guide cheeks, and south serpentine
-     cable cleats.
-   - **Mock PCB disk:** Ø20.0 x 1.6 mm disk with `"stacked"` J1/J2 holes for
-     press-fitting sample headers (`C492411`, `C2897385`) to test snap-in, blind plug
-     mating, finger unplugging, and cable tug relief immediately.
-3. Measure each printed test ring bore (and existing v0.1 `24x3`, `29x3`, `29x9`
-   rings) with calipers. Test `S`, `M`, and `L` in the matching rings and in real
-   houses:
-   - pushes straight in by hand without tilting;
-   - flange sits flat against the wall;
-   - pulls out smoothly with two fingers via the south pull-tab.
-   Decide whether single-size `M` covers the fleet or `S` + `L` feels better.
-4. Fit sample vertical headers into the printed Mock PCB disk, snap it into Holder
-   `M`, mate both servo extension cables blind through the guide cheeks, press the
-   ribbons into the serpentine cleats, verify tug isolation and 1-second unplugging,
-   and check fit inside a bottom-lit house recess.
-5. When the `v0.1` boards arrive, test brightness and electrical protection, then
+2. **Coupon v0.2 (`hardware/holder/production/coupon-v0.2/`, tested 2026-11-16):**
+   clip rings `S` (Ø27.3), `M` (Ø28.7), and `L` (Ø29.2) all fit the v0.2 test rings;
+   in real houses, both `M` and `L` covered the full `Ø25 - 28 mm` fleet (Fellowship
+   Porters Ø25, Curiosity Shop Ø26, Yankee Candle Ø27, Partridge & Pear Ø28). Both
+   servo plugs slid smoothly through the stepped `C`-cheeks. However, two of `M`'s
+   narrow `2.2 x 1.0 mm` upper PCB posts snapped at `Z = 9 mm` from Bowden retraction
+   starvation, and an inner wall at `y = -13 mm` partially blocked the `S`-cleats.
+   Full notes and photos are in `coupon-v0.2/MANIFEST.md`.
+3. **Coupon v0.3 (`hardware/holder/production/coupon-v0.3/`):** single universal
+   `Ø29.0 mm` holder (`U`) with wide `~2.35 mm`-thick XY-flexing `C`-cradle jaws and
+   unobstructed full-wave south `S`-cleats, paired with the `v0.3` Mock PCB disk:
+   - Fit sample vertical headers (`C492411`, `C2897385`) into the Mock PCB disk and
+     slide it horizontally into the south (`-Y`) mouth until it clicks past the jaws.
+   - Mate both servo cables blind through the `C`-cheeks, press both ribbons along
+     their full depth into the two south `S`-cleats, verify tug isolation and
+     two-finger unplugging, and check clearance inside Yankee Candle's `12 mm` recess.
+4. When the `v0.1` boards arrive, test brightness and electrical protection, then
    print the production holders once `Pixel PCB v0.2` is finalized.
 
 ### Base station
