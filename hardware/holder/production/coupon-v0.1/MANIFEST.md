@@ -183,8 +183,7 @@ size (3 mm on the 29 x 3).
 
 ### Photos
 
-A clip ring seated in the 29 x 9 ring. A was the one asked for, but the photos
-don't show which variant it is.
+Clip ring A seated in the 29 x 9 ring.
 
 - `results/seated_29x9_top.jpg`: from above. The three arms have curled into a
   smaller circle. At about 1 o'clock, one arm's barb end is pressed against the
