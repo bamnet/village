@@ -1,9 +1,10 @@
-// Clip ring: the part that pushes into the house's lighting hole.
+// Clip ring (v0.2): the part that fits into the house's lighting hole.
 //
-// A flange sits against the outside of the wall. Arms rise through the hole,
-// and a barb on each arm's free end catches the hole's inner edge. The arms
-// curve around the axis and flex in the XY plane, so printing them upright
-// never loads the layer lines in bending. Print flange down, no supports.
+// A flange sits against the outside of the wall, with a small south (-Y) tab
+// pointing toward the cord notch. Three short XY-flexing arms rise into the
+// hole, each carrying a smooth cylindrical bore-contact crown inside Z = 1.4..4.4
+// mm (below wall_min's inner edge on thin walls, inside the bore on thick walls).
+// Print flange down in PETG, no supports.
 //
 // holder.scad builds the full holder on top of this. Render this file on its
 // own to see a single clip ring.
@@ -11,86 +12,162 @@
 include <params.scad>
 
 function arm_r_out(w) = arm_r_in + w;
-function barb_tip_r(k, r3 = barb_r_at_wall_min) = r3 + k * (barb_tip_z - wall_min);
-function arm_top(w, k, r3 = barb_r_at_wall_min) =
-    barb_tip_z + (barb_tip_r(k, r3) - arm_r_out(w)) / tan(lead_in_deg);
+function crown_bot_z(rc) = rc - crown_z0_r;  // 45 deg ramp above Z = 0
+function arm_top(w, rc = crown_r_def) =
+    crown_top_z + (rc - arm_r_out(w)) / tan(lead_in_deg);
 
-// Bending strain at the arm root when the barb is squeezed through hole_min.
-// Cantilever estimate: 1.5 * thickness * deflection / length^2.
-function arm_len() = (arm_r_in + 0.5) * arm_ang * PI / 180;
-function barb_bend(k, r3 = barb_r_at_wall_min) = barb_tip_r(k, r3) - hole_min / 2;
-function arm_strain(w, k, r3 = barb_r_at_wall_min) =
-    1.5 * w * barb_bend(k, r3) / pow(arm_len(), 2);
+// Bending strain and tip advance estimates when squeezed into `hole_d`.
+function arm_len(w = arm_w) = (arm_r_in + w / 2) * arm_ang * PI / 180;
+function crown_bend(rc = crown_r_def, hole_d = hole_min) = max(0, rc - hole_d / 2);
+function arm_strain(w = arm_w, rc = crown_r_def, hole_d = hole_min) =
+    1.5 * w * crown_bend(rc, hole_d) / pow(arm_len(w), 2);
+function tip_advance_deg(w = arm_w, rc = crown_r_def, hole_d = hole_min) =
+    let(r0 = arm_r_in + w / 2, r1 = r0 - crown_bend(rc, hole_d))
+    arm_ang * (r0 / r1 - 1);
 
-module barb_profile(w, k, r3) {
+module crown_profile(w, rc) {
     r_out = arm_r_out(w);
-    // 45 degree underside up to the retention face (printable overhang).
-    z0 = wall_min - (r3 - r_out);
+    z_bot = crown_bot_z(rc);
+    // Continue the 45 deg underside below Z = 0 until it meets r_out.
+    z_start = -(crown_z0_r - r_out);
+    top = arm_top(w, rc);
     polygon([
-        [arm_r_in, z0],
-        [r_out, z0],
-        [r3, wall_min],
-        [barb_tip_r(k, r3), barb_tip_z],
-        [r_out, arm_top(w, k, r3)],
-        [arm_r_in, arm_top(w, k, r3)],
+        [arm_r_in, z_start],
+        [r_out, z_start],
+        [crown_z0_r, 0],
+        [rc, z_bot],
+        [rc, crown_top_z],
+        [r_out, top],
+        [arm_r_in, top],
     ]);
 }
 
-module flange() {
-    rotate_extrude()
-        translate([flange_id / 2, -flange_t])
-            square([flange_od / 2 - flange_id / 2, flange_t]);
+// 2D footprint of the flange + south (-Y) pull-tab, minus the central opening.
+module flange_2d(with_tab = true) {
+    difference() {
+        hull() {
+            circle(d = flange_od);
+            if (with_tab)
+                for (sx = [-1, 1])
+                    translate([sx * tab_x_spread, tab_y_end + tab_corner_d / 2])
+                        circle(d = tab_corner_d);
+        }
+        circle(d = flange_id);
+    }
 }
 
-module clip_ring(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, label = "",
-                 rot = arm_rot) {
-    top = arm_top(w, k, r3);
+module flange(with_tab = true) {
+    difference() {
+        translate([0, 0, -flange_t])
+            linear_extrude(flange_t)
+                flange_2d(with_tab);
+        // 45 deg bottom finger-pinch chamfer around the central bore (Z = -flange_t
+        // up by 1.3 mm) so J2's plug housing is even easier to pinch and elephant's
+        // foot never narrows the opening.
+        translate([0, 0, -flange_t - 0.01])
+            cylinder(d1 = flange_id + 2.6, d2 = flange_id, h = 1.31);
+    }
+}
+
+// Cross-section of one edgewise serpentine cable slot (extruded along its path
+// via hull() of thin slices). Flat on the bed with a 45 deg entry chamfer,
+// vertical side walls, and a 45 deg peaked self-supporting roof.
+module cleat_slice_3d(x, y, w = cleat_w, z_shift = 0) {
+    hw = w / 2;
+    ch = 0.45; // bottom 45 deg lead-in chamfer
+    z_bed = -flange_t - 0.02;
+    z_wall_top = -flange_t + cleat_h_wall + z_shift;
+    z_peak = min(-0.55, z_wall_top + hw); // keep >=0.55 mm solid roof at Z = 0
+    translate([x, y, 0])
+        rotate([90, 0, 0])
+            linear_extrude(0.35, center = true)
+                polygon([
+                    [-hw - ch, z_bed],
+                    [ hw + ch, z_bed],
+                    [ hw, -flange_t + ch],
+                    [ hw, z_wall_top],
+                    [  0, z_peak],
+                    [-hw, z_wall_top],
+                    [-hw, -flange_t + ch],
+                ]);
+}
+
+// Dual parallel serpentine (S-bend) cable channels in the south (-Y) pull-tab.
+// Both channels wave in unison so the center divider stays wide and uniform.
+module south_cable_cleats(slot_w = cleat_w, steps = 22) {
+    y0 = -flange_id / 2 - 0.3; // -13.0: meets the 45 deg bore chamfer cleanly, clear of Root 2
+    y1 = tab_y_end - 0.4;      // -21.9: exits cleanly out the south tip
+    for (side = [-1, 1]) {
+        for (i = [0 : steps - 1]) {
+            ya = y0 + (y1 - y0) * i / steps;
+            yb = y0 + (y1 - y0) * (i + 1) / steps;
+            xa = side * cleat_x + cleat_amp * sin(360 * (ya - y0) / cleat_wave_l);
+            xb = side * cleat_x + cleat_amp * sin(360 * (yb - y0) / cleat_wave_l);
+            hull() {
+                cleat_slice_3d(xa, ya, slot_w);
+                cleat_slice_3d(xb, yb, slot_w);
+            }
+        }
+    }
+}
+
+module clip_ring(w = arm_w, rc = crown_r_def, label = "", rot = arm_rot,
+                 with_tab = true, with_cleats = false) {
+    top = arm_top(w, rc);
     r_out = arm_r_out(w);
-    assert(r3 > hole_max / 2, "no preload in the loosest hole (hole_max, wall_min)");
+    z_bot = crown_bot_z(rc);
+    z_start = -(crown_z0_r - r_out);
+    gap_deg = 360 / arm_n - arm_root_ang - arm_ang;
+
+    assert(z_start >= -flange_t + 0.3, "crown underside reaches print bed");
+    assert(crown_z0_r <= flange_id / 2 - 0.35, "crown underside too close to flange");
+    assert(z_bot <= wall_min - 0.5, "crown 45 deg underside could hook thin walls");
     assert(top <= inside_max, "arms reach too far into the house");
-    // The barb's 45 degree underside must stay clear of the flange.
-    z0 = wall_min - (r3 - r_out);
-    assert(r_out - z0 < flange_id / 2 - 0.3, "barb underside hits the flange");
+    assert(tip_advance_deg(w, rc, hole_sweep) < gap_deg - 10,
+           "curved arm tip advances too close to next root");
 
     difference() {
         union() {
-            flange();
+            flange(with_tab = with_tab);
             for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n) {
-                // Root block: ties the arm to the flange.
+                // Root block: ties the arm solidly into the flange right from Layer 1
+                // (reaches past the 1.3 mm bottom bore chamfer).
                 rotate_extrude(angle = arm_root_ang) {
                     translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
                     translate([arm_r_in, -flange_t])
-                        square([flange_id / 2 - arm_r_in + 0.01, flange_t]);
+                        square([flange_id / 2 + 2.0 - arm_r_in, flange_t]);
                 }
-                // Flexing arm (free of the flange; a gap separates them).
+                // Flexing arm (free of the flange; radial gap separates them).
                 rotate(arm_root_ang)
                     rotate_extrude(angle = arm_ang)
                         translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
-                // Barb at the free end.
-                rotate(arm_root_ang + arm_ang - barb_ang)
-                    rotate_extrude(angle = barb_ang) barb_profile(w, k, r3);
+                // Bore-contact crown near the free end.
+                rotate(arm_root_ang + arm_ang - crown_ang)
+                    rotate_extrude(angle = crown_ang) crown_profile(w, rc);
             }
         }
-        // Variant label, engraved in the flange's wall-side face.
+        if (with_cleats) south_cable_cleats();
+        // Variant label, engraved in the flange's wall-side face (+Y north side).
         if (label != "")
-            rotate(-60) translate([0, (flange_id + flange_od) / 4, -0.4])
+            translate([0, (flange_id + flange_od) / 4, -0.45])
                 linear_extrude(1)
-                    text(label, size = 2.6, font = "Liberation Sans:style=Bold",
+                    text(label, size = 3.0, font = "Liberation Sans:style=Bold",
                          halign = "center", valign = "center");
     }
-    echo(str("clip ", label, ": arm w=", w, " k=", k, " r3=", r3,
-             " tip r=", barb_tip_r(k, r3), " top z=", top,
-             " preload at hole_max/wall_min=", r3 - hole_max / 2,
-             " root strain at hole_min=", round(arm_strain(w, k, r3) * 1000) / 10, "%"));
+    echo(str("clip ", label, ": arm w=", w, " crown OD=", 2 * rc,
+             " z=[", z_bot, "..", crown_top_z, "] top=", round(top * 100) / 100,
+             " gap=", gap_deg, " deg (adv@", hole_min, "=",
+             round(tip_advance_deg(w, rc, hole_min) * 10) / 10, " deg)",
+             " strain@", hole_min, "=",
+             round(arm_strain(w, rc, hole_min) * 1000) / 10, "%"));
 }
 
-// Space the arms sweep through when squeezed through hole_min (for clearance
-// checks, not printing). Each slice of arm moves inward by the cantilever
-// deflection at that point; the barb moves by the full amount.
-module arm_sweep(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, rot = arm_rot,
-                 steps = 24) {
-    d = barb_bend(k, r3);
-    top = arm_top(w, k, r3);
+// Space the arms sweep through when squeezed through `hole_d` (for clearance
+// checks, not printing).
+module arm_sweep(w = arm_w, rc = crown_r_def, rot = arm_rot,
+                 hole_d = hole_sweep, steps = 20) {
+    d = crown_bend(rc, hole_d);
+    top = arm_top(w, rc);
     function defl(x) = d * x * x * (3 - x) / 2;   // x = 0 at root, 1 at tip
     for (i = [0 : arm_n - 1]) rotate(rot + i * 360 / arm_n + arm_root_ang) {
         for (s = [0 : steps - 1]) {
@@ -105,12 +182,12 @@ module arm_sweep(w = arm_w, k = barb_k, r3 = barb_r_at_wall_min, rot = arm_rot,
                         translate([arm_r_in, -flange_t]) square([w, top + flange_t]);
             }
         }
-        am = arm_ang - barb_ang / 2;
+        am = arm_ang - crown_ang / 2;
         hull() {
-            rotate(arm_ang - barb_ang) rotate_extrude(angle = barb_ang) barb_profile(w, k, r3);
+            rotate(arm_ang - crown_ang) rotate_extrude(angle = crown_ang) crown_profile(w, rc);
             translate(-d * [cos(am), sin(am), 0])
-                rotate(arm_ang - barb_ang) rotate_extrude(angle = barb_ang)
-                    barb_profile(w, k, r3);
+                rotate(arm_ang - crown_ang) rotate_extrude(angle = crown_ang)
+                    crown_profile(w, rc);
         }
     }
 }
