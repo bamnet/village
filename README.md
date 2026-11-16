@@ -604,6 +604,11 @@ One printed part, `holder.scad`:
    `hardware/holder/production/coupon-v0.1/`. Record results in its
    `MANIFEST.md`. As with the PCB releases, a printed package is never changed;
    a design change gets a new folder.
+
+   **Coupon v0.1 failed (2026-11-16):** no variant pushes straight in by hand,
+   and none fits a Ø24 hole. The curved arms curl into each other and twist.
+   They also grip far more than needed. Steps 3 - 5 wait for a new clip design.
+   Results and photos are in the package's `MANIFEST.md`.
 3. For each variant, in each ring:
    - it pushes in by hand;
    - the flange sits tight against the ring;

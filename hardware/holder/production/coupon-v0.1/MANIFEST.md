@@ -1,6 +1,7 @@
 # House holder coupon v0.1: print package
 
-Status: **ready to print, not yet printed.** Do not change the STLs. A design
+Status: **printed 2026-11-15 - 16. Failed: no variant pushes straight into
+any test ring.** See [Results](#results). Do not change the STLs. A design
 change gets a new folder (`coupon-v0.2`, or `holder-v0.1` for the full holder).
 The G-code was added on 2026-11-14 before anything was printed. It is sliced from
 these same STLs.
@@ -134,6 +135,92 @@ the G-code footer says `gcode_flavor = marlin` and
 
 ## Results
 
-(Filament, slicer and settings used; measured test ring bores; for each variant:
-insertion, flange seating, grip in Ø29 x 3, creep after a day in Ø24 x 9, 20
-insert/remove cycles, real houses tried. Which variant won.)
+Tested 2026-11-16. The clip ring design doesn't work: no variant pushes straight
+in by hand, even in the largest test hole. The README's creep and wear tests
+(test plan step 4) were skipped, because the design has to change first. No
+variant won.
+
+### Print
+
+- Insignia PETG 1.75 mm, white. Printed with the G-code in this folder: 235 /
+  70 °C, BLTouch bed probing before each print.
+- The first coupon attempt at 240 °C stopped twice with thermal runaway on the
+  hotend (E1). Its right-hand rings' first layers came loose and clumped (no bed
+  probing yet). Both were fixed by the current G-code and the PID tune.
+- The test rings printed first, then the coupon. The coupon took 2 h 51 min
+  against PrusaSlicer's 2 h 01 min estimate. The start G-code's bed heating
+  and probing account for part of that, and the printer moves slower than the
+  estimate assumes.
+
+### Test ring holes
+
+| Ring | Designed | Measured |
+|---|---|---|
+| 24 x 3 | Ø24 | Ø24.0 |
+| 24 x 9 | Ø24 | Ø23.25 |
+| 29 x 3 | Ø29 | Ø28.27 |
+| 29 x 9 | Ø29 | Ø28.3 |
+
+Printed holes came out 0 - 0.75 mm small, and not by a fixed amount: the
+24 x 3 ring came out true but the 29 x 3 ring didn't. The walls measured on
+size (3 mm on the 29 x 3).
+
+### Fit
+
+| Ring | A (baseline) | B (stiffer) | C (steeper barb) | D (more preload) |
+|---|---|---|---|---|
+| 29 x 3 | Only at an angle, one arm at a time | Same as A | Only with arms bent by hand | Same as A |
+| 29 x 9 | Goes in; arms end up visibly bent | Goes in; slightly better | Doesn't fit | Goes in; slightly better |
+| 24 x 3 | No | No | No | No |
+| 24 x 9 | Skipped: same hole size as 24 x 3 | | | |
+
+- **Grip in 29 x 3** (A, B, D): all very secure, more than needed. Pulling them
+  out felt like it could damage something.
+- **Damage:** after all the tests, no arm is visibly bent and there is no stress
+  whitening.
+- **Not done:** creep, wear, cable-weight hang, barb diameter after the tests,
+  real houses.
+
+### Photos
+
+A clip ring seated in the 29 x 9 ring. A was the one asked for, but the photos
+don't show which variant it is.
+
+- `results/seated_29x9_top.jpg`: from above. The three arms have curled into a
+  smaller circle. At about 1 o'clock, one arm's barb end is pressed against the
+  next arm's root block.
+- `results/seated_29x9_side_1.jpg`, `results/seated_29x9_side_2.jpg`: from the
+  side. The barbs are tilted, not level, and the arms lean inward toward the
+  top.
+
+### Why it failed
+
+These are estimates from the design geometry and the photos, not
+measurements.
+
+1. **The barbs have to move inward too far.** Getting the barbs through
+   Ø28.3 means about 2.5 mm per side for A and B, 3.0 mm for D and 3.5 mm for C.
+   Through Ø24 it is about 4.6 mm. Seated in a 9 mm wall, the sloped barb face
+   leaves the arms bent about 2.4 mm (A, B) to 3.3 mm (C).
+2. **Curved arms run into each other.** An arc that curls tighter also moves
+   its tip forward around the circle. Passing Ø28 takes roughly 25 degrees of
+   that movement, but there are only 18 degrees between each arm's tip and the
+   next arm's root. So the arms jam against each other instead of flexing. That
+   also explains why no force gets them through Ø24.
+3. **The load at the top twists the arms.** The barb is at the top of the arm,
+   so the top bends in more than the bottom and the arm twists. The stiffer B
+   resisted that a little better.
+4. **There is more grip than needed.** Even in the loosest ring (Ø28.27 x 3,
+   0.87 mm of preload for A), removal felt risky.
+5. **The size range was too wide** for one snap ring: Ø24 - 29 x 3 - 9 mm,
+   when the houses measured Ø25 - 28 (README "Physical constraints").
+
+PETG itself was fine: nothing took a permanent bend and nothing whitened.
+
+### Carry into the next design
+
+- Avoid curved arms around the ring, or leave enough room between them for
+  the tips to move.
+- Keep the barb load from twisting the arms.
+- Use less barb travel and less preload. Grip has plenty to spare.
+- Size for the houses' Ø25 - 28, and expect printed holes 0 - 0.75 mm small.
