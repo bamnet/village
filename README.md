@@ -204,7 +204,9 @@ We obviously want to modernize this with an LED.
   meaning 3 warm-white RGBW 5050 LEDs driven at about 16 - 20 mA.
 - Each house MUST use one WS2814 as its driver. It is a 4-channel RGBW
   constant-current driver that WLED supports (configured as SK6812 RGBW type). Its
-  outputs are fixed at 16.5 mA per channel, about 80% of the 2018 current.
+  outputs are fixed at 16.5 mA per channel (datasheet typical), about 80% of the
+  2018 current. Pixel v0.1 measured about 15.4 mA per channel at 12 V, about 14.7 mA
+  when warm (2026-11-17, `hardware/pixel/production/v0.1/MANIFEST.md`).
   **TBD:** confirm this is bright enough.
 - As of 2026-09-30, the original SOP-12 WS2814 (C965562) shows 0 stock at LCSC.
   The draft schematic uses the WS2814F (FSOP-8, C5446694, about 107,000 in stock).
@@ -318,8 +320,10 @@ first-class requirement here.
   5 V SK6812 LEDs need at least 4.5 V at the last house, which leaves only about
   0.5 V for losses across a chain of servo cables. At 12 V, 3 white/blue/green LEDs
   in series need about 9 - 9.6 V (3.0 - 3.2 V each). Allowing for the driver output,
-  that leaves roughly 1.5 V of headroom. These are estimates: the WS2814 datasheet
-  does not specify the minimum output voltage it needs to regulate.
+  that leaves roughly 1.5 V of headroom. Measured on Pixel v0.1 (2026-11-17):
+  white loses only about 2% of its current per volt from 12 V down to 10.5 V, has a
+  knee at about 10 V, and falls steeply below that. Each house SHOULD therefore get
+  at least 10.5 V, so cable drop can be up to 1.5 V.
 - Estimated load: about 66 mA per house with all four channels at full, so about 1.5 A
   (18 W) for 22 houses. With warm white only, it is about 16.5 mA per house, so about
   0.4 A.
@@ -352,9 +356,9 @@ first-class requirement here.
     a sample (diode mode, red lead on the anode) showed that the top view is
     correct. With the corner mark at the white cathode, the white anode is directly
     across from it. That is the footprint as drawn, not a mirror image.
-  - **TBD:** both footprints are unproven until a fabricated board is assembled and
-    works. The TCWIN LED would fit the same pads, but its symbol pin numbers would
-    need remapping, because its pad numbering differs.
+  - Both footprints are proven on Pixel v0.1 (2026-11-17): two boards' U1 and all
+    three LEDs work on every channel. The TCWIN LED would fit the same pads, but
+    its symbol pin numbers would need remapping, because its pad numbering differs.
 - In order to fit the 3D-printed holder that sits in each house's lighting hole,
   the per-house PCB ("Pixel PCB") MUST be a circle no bigger than 20 mm in diameter.
   This is small, but large enough to fit several LEDs as needed.
