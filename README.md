@@ -384,8 +384,18 @@ first-class requirement here.
     out: at v0.1's spacing they don't fit side by side, and a right-angle female
     socket can't take the male plug where the board is under it (see "Servo
     plugs and cable" under Physical constraints).
-  - **TBD:** JLCPCB-assemblable vertical headers for v0.2: a male 1x3, and a
-    standard 8.5 mm female 1x3.
+  - Chosen for v0.2 (2026-11-17), a mating XFCN pair. Both are JLCPCB extended
+    parts, and both match `hardware/holder/params.scad`:
+    - J1, male: XFCN PZ254V-11-03P (C2937625). The body is 7.62 x 2.50 mm, the
+      pins are 0.64 mm square with 6.1 mm above the body, and the tail is 3.0 mm.
+      LCSC had 907,680 in stock.
+    - J2, female: XFCN PM254V-11-03-H85 (C541850). The body is 8.12 (±0.40) x
+      8.50 mm and the tail is 3.2 mm. LCSC had 37,990 in stock.
+      Alternative: HCTL PM254-1-03-Z-8.5 (C2897366), the vertical version of
+      v0.1's J2.
+    - KiCad's stock `PinHeader_1x03_P2.54mm_Vertical` and
+      `PinSocket_1x03_P2.54mm_Vertical` footprints fit both (1.0 mm drill).
+    - **TBD:** check samples in the coupon v0.3 mock disk.
 - Provisional layout (placed and routed, pending real plug dimensions):
   `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
@@ -462,6 +472,14 @@ first-class requirement here.
     (for example 4 x 4) with Standard two-sided assembly, or move the headers so
     that single-sided assembly covers them. Hand soldering MUST be kept to a
     minimum.
+  - Asked JLCPCB support on 2026-11-17 three things. First, whether Economic
+    assembly can solder through-hole headers whose bodies are on the bottom, with
+    their pins soldered on the top among the SMT parts. Second, if not, whether
+    they will hand- or selective-solder them on a Standard-assembly panel of at
+    least 70 mm. Third, what clearance they need between those pins and the
+    top-side SMT parts. Their capabilities page says THT is wave-soldered in both
+    tiers and Economic is single-sided only. Until they answer, keep about
+    1.5 - 2 mm clear around the pins.
   - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
     after the silkscreen version. Each has the exact uploaded files and a
     `MANIFEST.md` with the source commit, file hashes, checks, and the order
