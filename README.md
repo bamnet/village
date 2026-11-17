@@ -477,9 +477,23 @@ first-class requirement here.
     their pins soldered on the top among the SMT parts. Second, if not, whether
     they will hand- or selective-solder them on a Standard-assembly panel of at
     least 70 mm. Third, what clearance they need between those pins and the
-    top-side SMT parts. Their capabilities page says THT is wave-soldered in both
-    tiers and Economic is single-sided only. Until they answer, keep about
-    1.5 - 2 mm clear around the pins.
+    top-side SMT parts. JLCPCB support answered on 2026-11-17:
+    - Bottom-side header bodies make the board double-sided, so v0.2 needs
+      **Standard PCBA**. Economic is single-sided only.
+    - A customer panel of 4 x 4 boards with mouse bites, 5 mm rails and
+      fiducials is accepted. It meets the 70 x 70 mm minimum and is within the
+      250 x 250 mm maximum.
+    - The headers' joints are on the SMT side, so they are selective- or
+      hand-soldered, not wave-soldered. The price is $0.0164 per joint plus a
+      $3.58 hand-soldering labor fee per order. That is about $3.15 in joints for
+      32 boards (6 joints each).
+    - There is no published minimum clearance between through-hole pins and SMT
+      parts; JLCPCB checks it in DFM review after the order is uploaded. They
+      call 1 - 2 mm "tight for hand soldering". Low-profile parts are generally
+      workable, but taller parts may block the iron.
+    - Decided: v0.2 is ordered as a 4 x 4 panel with Standard assembly. Keep
+      parts near the pins low (0402/0603), and keep the 1.6 mm-tall LEDs as far
+      from the pins as the edge keep-out allows.
   - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
     after the silkscreen version. Each has the exact uploaded files and a
     `MANIFEST.md` with the source commit, file hashes, checks, and the order
