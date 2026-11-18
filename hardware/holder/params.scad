@@ -67,14 +67,16 @@ pcb_t = 1.6;
 led_h = 1.6;       // HL-5050 package height (typical 5050)
 
 layout    = "stacked";
+stack_dx  = -1.20; // Pixel v0.2 header stack X offset (west) in holder coords
+stack_dy  = -0.45; // Pixel v0.2 header stack Y offset (south, toward cord notch)
 pin_gap   = 9.4;
 v02_row_y = 0;
 plug_gap  = 0.2;
 
-// Vertical header bodies below the board.
+// Vertical header bodies below the board (XFCN C2937625 male, C541850 female).
 j1_body_w = 7.62;
 j1_body_h = 2.5;
-j2_body_w = 8.09;
+j2_body_w = 8.12;
 j2_body_h = 8.5;
 hdr_t     = 2.54;
 
@@ -93,21 +95,22 @@ pm_l          = 22.7;
 pm_engage     = 9.3;
 pm_pin_recess = 3.1;
 pm_dx         = (1.4 - 0.85) / 2;
-pm_dx_sign    = 1;
+pm_dx_sign    = 1;   // settled in Pixel v0.2: J2 has DATA_OUT on the east (+X) pin
 
 cable_w      = 4.0;
 cable_t      = 1.4;
 cable_bend_d = 4;
 
-// Pin rows (bottom side), in model coordinates.
+// Pin rows (bottom side), in model coordinates (KiCad Y is flipped: Y_kicad = -Y).
+// Settled Pixel v0.2 ("stacked"): J1 = (-1.20, +1.650), J2 = (-1.20, -1.975).
 stack_sep  = pf_t / 2 + plug_gap + pm_t / 2;   // 3.625
 j1_x = layout == "v0.1" ? -4.35
-     : layout == "side" ? -(pin_gap + pm_w / 2 - pf_w / 2) / 2 : 0;
+     : layout == "side" ? -(pin_gap + pm_w / 2 - pf_w / 2) / 2 : stack_dx;
 j2_x = layout == "v0.1" ?  4.54
-     : layout == "side" ? j1_x + pin_gap : 0;
-stack_j2_y = -(stack_sep + pf_t / 2 - pm_t / 2) / 2; // -1.525
-j1_y = layout == "v0.1" ? 4.0 : layout == "side" ? v02_row_y : stack_j2_y + stack_sep; // +2.100
-j2_y = layout == "v0.1" ? 4.0 : layout == "side" ? v02_row_y : stack_j2_y;             // -1.525
+     : layout == "side" ? j1_x + pin_gap : stack_dx;
+stack_j2_y = -(stack_sep + pf_t / 2 - pm_t / 2) / 2; // -1.525 before stack_dy
+j1_y = layout == "v0.1" ? 4.0 : layout == "side" ? v02_row_y : stack_j2_y + stack_sep + stack_dy; // +1.650
+j2_y = layout == "v0.1" ? 4.0 : layout == "side" ? v02_row_y : stack_j2_y + stack_dy;             // -1.975
 
 j1_stack    = j1_body_h + pf_l;                      // 16.6
 j2_stack    = pm_l + max(0, j2_body_h - pm_engage);  // 22.7
@@ -127,26 +130,28 @@ pillar_r_in  = 8.95;  // inner radius of the two wide structural pillars
 jaw_r_pocket = 10.10; // PCB pocket inner radius (ID 20.20; -12/+192 mouth chord = 19.76)
 jaw_r_out    = 12.45; // outer radius of the upper C-jaw wall (~2.35 mm thick)
 ledge_r      = 9.35;  // bottom ledge supporting the PCB edge
-hook_r       = 9.48;  // 45 deg upper capture lip radius (clears all top parts)
+hook_r       = 9.52;  // 45 deg upper capture lip radius (clears all v0.2 courtyards)
 
 // Stepped C-shaped plug guide cheeks (Z = -flange_t .. guide_top_z).
 // Validated smooth fit in coupon v0.2. `guide_top_z = 7.1` stays 0.4 mm below
 // the bare soldered headers (Z = 7.5) so a soldered PCB slides straight in from
 // -Y, then mating the plugs locks PCB + holder together across Z = 7.1..16.0.
-guide_top_z  = 7.1;
-guide_j1_hw  = pf_w / 2 + 0.425;                 // 4.50 mm half-width
-guide_j2_hw  = pm_w / 2 + pm_dx + 0.40;          // 5.80 mm half-width
-guide_y_n    = j1_y + pf_t / 2 + 0.425;          // +3.95 mm
-guide_y_s    = j2_y - pm_t / 2 - 0.425;          // -3.95 mm
-guide_open_n = 2.8;
-guide_open_s = 3.4;
+guide_top_z   = 7.1;
+guide_trim_r  = 9.45;  // outer cheek trim radius around (0, 0); clears squeezed Arm 1
+guide_j1_hw   = pf_w / 2 + 0.425;                 // 4.50 mm half-width around j1_x
+guide_j2_hw   = pm_w / 2 + pm_dx + 0.40;          // 5.80 mm half-width around j2_x
+guide_y_n     = j1_y + pf_t / 2 + 0.425;          // +3.50 mm (with stack_dy = -0.45)
+guide_y_s     = j2_y - pm_t / 2 - 0.425;          // -4.40 mm (with stack_dy = -0.45)
+guide_open_n  = 2.8;
+guide_open_s  = 3.4;
 
-// Extended south (-Y) pull-tab and unobstructed full-2-curve serpentine cleats.
-tab_y_end    = -24.2; // 7.2 mm south tab gives 12.6 mm unobstructed S-channel
-tab_x_spread = 5.4;
+// Shortened south (-Y) pull-tab (`-21.5 mm`, 2.7 mm shorter than coupon v0.3
+// so it clears Yankee Candle's bottom recess edge) with full-2-curve S-cleats.
+tab_y_end    = -21.5; // 4.5 mm south tab (proven recess fit in coupon v0.2)
+tab_x_spread = 4.8;   // tighter corner fillets for extra recess wall clearance
 tab_corner_d = 7.0;
 cleat_x      = 2.85;  // +/-X centerline (fits cleanly inside 250..290 deg south gap)
-cleat_amp    = 0.95;  // lateral S-wave amplitude
-cleat_wave_l = 9.0;   // wavelength -> 1.35 full waves (both curves fully engaged)
+cleat_amp    = 0.85;  // lateral S-wave amplitude (~3.8 mm min bend diameter)
+cleat_wave_l = 7.6;   // wavelength -> 1.30 full waves inside y = -12.0 .. -21.9
 cleat_w      = 1.68;  // slot width for 1.4 mm flat servo ribbon
 cleat_h_wall = 2.45;  // vertical wall before 45 deg peaked roof

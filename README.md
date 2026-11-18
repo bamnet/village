@@ -519,7 +519,8 @@ and +Z points into the house.
 One printed part, `holder.scad` (printed flange down in PETG, zero supports):
 
 - **Clip ring** (`clip.scad`): a flange (Ø34 x 3.8 mm, Ø25.4 opening, with a rounded
-  south pull-tab reaching `y = -24.2 mm`) sits against the outside of the wall. Three
+  south pull-tab reaching `y = -21.5 mm`, shortened `2.7 mm` after `coupon-v0.3` to
+  clear Yankee Candle's recess wall) sits against the outside of the wall. Three
   short arms (`arm_w = 0.84 mm`, `arm_ang = 66°`, leaving a `40°` gap so tips never
   collide) flex in the XY plane so layer lines never take bending loads.
   - Each arm carries a smooth cylindrical **bore-contact crown** (`Ø29.0 mm`
@@ -547,15 +548,18 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
     soldered `Z = 7.5 mm` headers so a soldered PCB slides horizontally in from `-Y`)
     align both plugs blind onto J1/J2, block `1`-pin-offset (`2.54 mm`) mis-plugging,
     and pin the PCB in place once mated.
-- **Header layout** (`layout` in `params.scad`): defaults to `"stacked"` (J1 at
-  `y = +2.1 mm`, J2 at `y = -1.525 mm`, `10.25 x 6.45 mm` block).
-- **Tool-less cable cleat:** the extended south (`-Y`) pull-tab (`y = -24.2 mm`)
-  houses two parallel serpentine (`S`-bend) edgewise slots (`1.68 mm` wide, `45°`
-  peaked roofs) that cut cleanly through into the central bore (`y = -11.0 mm`) via a
-  flared horn so both `S`-curves engage along their full height without zip ties.
-- `pixel_mock.scad` models the board, vertical headers, and measured plugs.
-  `assembly.scad` checks overlaps (`holder_mock`, `sweep_mock` including guide cheeks
-  and cradle pillars at `24.5 mm`, and `plugs`).
+- **Header layout** (`layout` in `params.scad`): defaults to `"stacked"`, shifted
+  `stack_dx = -1.20 mm` (west) and `stack_dy = -0.45 mm` (south) to match Pixel PCB
+  v0.2: J1 at `(-1.20, +1.650 mm)` and J2 at `(-1.20, -1.975 mm)` (`10.25 x 6.45 mm`
+  plug block, `pm_dx_sign = +1` with J2 `DATA_OUT` on the east pin).
+- **Tool-less cable cleat:** the south (`-Y`) pull-tab (`y = -21.5 mm`) houses two
+  parallel serpentine (`S`-bend) edgewise slots (`1.68 mm` wide, `7.6 mm` wavelength =
+  `1.30` waves, `45°` peaked roofs) that cut cleanly through into the central bore
+  (`y = -11.0 mm`) via a flared horn so both `S`-curves engage along their full height
+  without zip ties.
+- `pixel_mock.scad` models Pixel PCB v0.2's parts, vertical headers, and measured
+  plugs. `assembly.scad` checks overlaps (`holder_mock`, `sweep_mock` including guide
+  cheeks and cradle pillars at `24.5 mm`, and `plugs`).
 
 #### Open items
 
@@ -570,20 +574,21 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
 
 #### Feedback for Pixel PCB v0.2
 
-- Use vertical headers on the bottom: standard `2.5 mm` male 1x3 for J1, and standard
-  `8.5 mm` female 1x3 socket for J2 (see the open items).
-- Put the headers in two stacked rows through the center, as in `params.scad`'s
-  "stacked" layout: both rows east-west and centered on x = 0, J1 (male) at
-  y = +2.1 mm and J2 (female) at y = -1.525 mm (KiCad Y is flipped). Either pin
-  order works. Side-by-side rows can't clear the clip ring's arms.
-- The six pin tails then come up through the middle of the top side, in a
-  roughly 5.7 x 4.3 mm patch. The LEDs and U1 have to go around it.
+- Use vertical headers on the bottom: standard `2.5 mm` male 1x3 for J1 (`C2937625`),
+  and standard `8.5 mm` female 1x3 socket for J2 (`C541850`; see the open items).
+- Put the headers in two stacked east-west rows shifted `1.20 mm` west and `0.45 mm`
+  south (`params.scad` `"stacked"` layout): J1 at `(-1.20, +1.650 mm)` and J2 at
+  `(-1.20, -1.975 mm)` in holder coords (`(-1.20, -1.650)` and `(-1.20, +1.975)` in
+  KiCad, since KiCad Y is flipped). J2 puts `DATA_OUT` on the east (`+X`) pin
+  (`pm_dx_sign = +1`).
+- The six pin tails come up near the middle of the top side; shifting the stack west
+  leaves clearance for the north, east, and south LEDs (D2, D3, D4) while U1 and the
+  low-profile passives sit on the west side.
 - Keep a clear ring at the edge of the top side for the hook lips (parts at
-  r ≤ 9.25 mm). The south LED (D3) reaches r 9.62 mm (clear of the south-open C-jaws).
-- Add an orientation feature, such as a notch, flat or small hole at the south edge,
-  so the board seats the same way every time.
+  r ≤ 9.25 mm). The south LED (D4) reaches r 9.59 mm in the south-open C-jaws.
+- The off-center plugs key orientation mechanically; a south-pointing silkscreen
+  arrow marks the board visually without needing an edge notch.
 - White solder mask, as the 2025 spec asked; v0.1 is green.
-- Center the LED cluster (v0.1's sits about 2.5 mm south of center).
 
 #### Test plan
 
@@ -599,16 +604,16 @@ One printed part, `holder.scad` (printed flange down in PETG, zero supports):
    narrow `2.2 x 1.0 mm` upper PCB posts snapped at `Z = 9 mm` from Bowden retraction
    starvation, and an inner wall at `y = -13 mm` partially blocked the `S`-cleats.
    Full notes and photos are in `coupon-v0.2/MANIFEST.md`.
-3. **Coupon v0.3 (`hardware/holder/production/coupon-v0.3/`):** single universal
-   `Ø29.0 mm` holder (`U`) with wide `~2.35 mm`-thick XY-flexing `C`-cradle jaws and
-   unobstructed full-wave south `S`-cleats, paired with the `v0.3` Mock PCB disk:
-   - Fit sample vertical headers (`C492411`, `C2897385`) into the Mock PCB disk and
-     slide it horizontally into the south (`-Y`) mouth until it clicks past the jaws.
-   - Mate both servo cables blind through the `C`-cheeks, press both ribbons along
-     their full depth into the two south `S`-cleats, verify tug isolation and
-     two-finger unplugging, and check clearance inside Yankee Candle's `12 mm` recess.
-4. When the `v0.1` boards arrive, test brightness and electrical protection, then
-   print the production holders once `Pixel PCB v0.2` is finalized.
+3. **Coupon v0.3 (`hardware/holder/production/coupon-v0.3/`, tested 2026-11-18):**
+   single universal `Ø29.0 mm` holder (`U`) with wide `~2.35 mm`-thick XY-flexing
+   `C`-cradle jaws and cleared south `S`-cleats. Fit well inside Yankee Candle (`12 mm`
+   recess), with the outer tip of the `-24.2 mm` south tab just rubbing the recess edge;
+   shortened by `2.7 mm` to `-21.5 mm` (`1.30` full waves retained) for production.
+4. **Production holder v0.1 (`hardware/holder/production/holder-v0.1/`):** combines the
+   shortened `-21.5 mm` south tab with Pixel PCB v0.2's `(-1.20, -0.45)` shifted plug
+   guide cheeks (`"v0.1"` engraved on the wall-facing flange face). Includes both a
+   `1x` single-holder G-code (`~55 min` spot-check) and a `4x` (`2 x 2`) batch G-code
+   for printing the 22-house fleet (`6 x 4 = 24` holders with 2 spares).
 
 ### Base station
 

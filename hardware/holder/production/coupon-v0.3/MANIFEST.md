@@ -1,8 +1,9 @@
 # House holder coupon v0.3: print package
 
-Status: **ready to print** (rendered and sliced 2026-11-16). Do not change the
-STLs once printed. If this passes, the holder STL becomes the production
-design (`holder-v0.1`).
+Status: **printed & tested 2026-11-18. Good fit inside Yankee Candle; the
+extended `-24.2 mm` south tab rubbed the outer edge of the under-house recess,
+so production holders shorten `tab_y_end` back by `2.7 mm` to `-21.5 mm`.** See
+[Results](#results). Do not change the STLs.
 
 Purpose: verify the strengthened upper curved `C`-cradle jaws, horizontal XY
 PCB slide-in, and unobstructed full-wave south serpentine cable cleats on a
@@ -90,4 +91,16 @@ Compare re-sliced G-code ignoring line 1's timestamp (`tail -n +2 FILE | sha256s
 
 ## Results
 
-*(Record bench and house results here after printing.)*
+Tested 2026-11-17 - 18.
+
+- **Overall fit inside Yankee Candle (`12 mm` shallowest bottom recess):** good
+  fit; the strengthened `C`-cradle jaws printed cleanly and the cleared inner
+  `S`-cleat mouths fixed the bore-side wall obstruction from `coupon-v0.2`.
+- **South pull-tab recess clearance:** the outer tip of the extended `-24.2 mm`
+  south `S`-channel tab started to rub against the outer edge of Yankee
+  Candle's under-house recess.
+- **Carry into production (`holder-v0.1`):** shorten `tab_y_end` by `2.7 mm`
+  back to `-21.5 mm` (`tab_x_spread = 4.8 mm` for extra corner clearance) while
+  starting the `S`-wave right at `y = -12.0 mm` (`cleat_wave_l = 7.6 mm`,
+  `cleat_amp = 0.85 mm`) so `1.30` full `S`-waves still engage inside the
+  shorter tab, paired with Pixel PCB v0.2's `(-1.20, -0.45)` header offset.

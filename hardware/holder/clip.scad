@@ -92,8 +92,8 @@ module cleat_slice_3d(x, y, w = cleat_w) {
 // cables and both S-curves engage along their full height.
 module south_cable_cleats(slot_w = cleat_w, steps = 28) {
     y_horn = -11.0;        // inside the bore (`r = 12.7` chord at x=3.7 is y=-12.15)
-    y0     = -12.6;        // start of the sinusoidal S-wave
-    y1     = tab_y_end - 0.4; // -24.6: exits cleanly out the south tip
+    y0     = -12.0;        // start S-wave right at the bore edge (`1.30` waves to -21.9)
+    y1     = tab_y_end - 0.4; // -21.9: exits cleanly out the south tip
     for (side = [-1, 1]) {
         // Flared straight lead-in horn breaking cleanly through the inner bore wall.
         hull() {
@@ -149,11 +149,12 @@ module clip_ring(w = arm_w, rc = crown_r_def, label = "", rot = arm_rot,
             }
         }
         if (with_cleats) south_cable_cleats();
-        // Variant label, engraved in the flange's wall-side face (+Y north side).
+        // Variant / version label, engraved in the flange's wall-side face (+Y).
         if (label != "")
             translate([0, (flange_id + flange_od) / 4, -0.45])
                 linear_extrude(1)
-                    text(label, size = 3.0, font = "Liberation Sans:style=Bold",
+                    text(label, size = len(label) > 1 ? 2.2 : 3.0,
+                         font = "Liberation Sans:style=Bold",
                          halign = "center", valign = "center");
     }
     echo(str("clip ", label, ": arm w=", w, " crown OD=", 2 * rc,

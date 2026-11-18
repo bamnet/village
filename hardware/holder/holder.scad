@@ -101,44 +101,48 @@ module curved_cradle_jaw(ang_p0, ang_p1, ang_j0, ang_j1, top) {
     }
 }
 
-// 2D cross-section of the stepped J1/J2 inner plug pocket (validated smooth fit).
+// 2D cross-section of the stepped J1/J2 inner plug pocket, centered on
+// `(j1_x, j1_y)` and `(j2_x, j2_y)` from `params.scad`.
 module plug_pocket_2d(extra = 0) {
-    translate([-(guide_j1_hw + extra), 0])
-        square([2 * (guide_j1_hw + extra), guide_y_n + extra]);
-    translate([-(guide_j2_hw + extra), guide_y_s - extra])
-        square([2 * (guide_j2_hw + extra), -guide_y_s + extra + 0.9]);
+    y_split = (j1_y - pf_t / 2 + j2_y + pm_t / 2) / 2;
+    translate([j1_x - (guide_j1_hw + extra), y_split - 0.40])
+        square([2 * (guide_j1_hw + extra), guide_y_n + extra - (y_split - 0.40)]);
+    translate([j2_x - (guide_j2_hw + extra), guide_y_s - extra])
+        square([2 * (guide_j2_hw + extra), (y_split + 0.45) - (guide_y_s - extra)]);
 }
 
-// Stepped C-shaped guide cheeks on +/-X, anchored broadly into the two wide
-// pillars (`26.5..63.5` East-North-East and `146.5..183.5` West).
+// Stepped C-shaped guide cheeks on +/-X, shifted with `(j1_x, j1_y)` /
+// `(j2_x, j2_y)` and anchored broadly into the two wide pillars (`26.5..63.5`
+// East-North-East and `146.5..183.5` West).
 module plug_guide_cheeks() {
     h_tot = guide_top_z + flange_t;
-    wall_t = 1.50;
+    wall_t = 1.45;
     funnel_h = 0.65;
+    y_split = (j1_y - pf_t / 2 + j2_y + pm_t / 2) / 2;
 
     difference() {
         translate([0, 0, -flange_t])
             linear_extrude(h_tot) {
                 union() {
                     intersection() {
-                        circle(r = 8.15);
+                        circle(r = guide_trim_r);
                         difference() {
                             offset(r = wall_t) plug_pocket_2d(0);
-                            translate([-guide_open_n, 0])
-                                square([2 * guide_open_n, guide_y_n + 3]);
-                            translate([-guide_open_s, guide_y_s - 3])
-                                square([2 * guide_open_s, -guide_y_s + 3]);
+                            translate([j1_x - guide_open_n, y_split])
+                                square([2 * guide_open_n, guide_y_n - y_split + 3]);
+                            translate([j2_x - guide_open_s, guide_y_s - 3])
+                                square([2 * guide_open_s, y_split - guide_y_s + 3]);
                         }
                     }
                     // Thick anchor webs tying East cheek into Pillar E (`44 deg`)
                     // and West cheek into Pillar W (`172 deg`).
                     hull() {
                         rotate(44) translate([pillar_r_in + 0.5, 0]) circle(d = 3.2);
-                        translate([guide_j1_hw + 0.70, guide_y_n + 0.45]) circle(d = 2.0);
+                        translate([j1_x + guide_j1_hw + 0.65, guide_y_n + 0.40]) circle(d = 2.0);
                     }
                     hull() {
                         rotate(172) translate([pillar_r_in + 0.5, 0]) circle(d = 3.2);
-                        translate([-(guide_j1_hw + 0.70), 1.2]) circle(d = 2.2);
+                        translate([j1_x - (guide_j1_hw + 0.65), y_split + 1.0]) circle(d = 2.2);
                     }
                 }
             }
@@ -178,4 +182,4 @@ module holder(w = arm_w, rc = crown_r_def, label = "") {
              ", J2 plug end z=", pcb_bot - j2_stack));
 }
 
-holder();
+holder(label = "v0.1");

@@ -12,10 +12,9 @@ module mock_pcb_disk() {
     translate([0, 0, -flange_t]) {
         difference() {
             cylinder(d = pcb_d - 0.05, h = pcb_t);
-            // "stacked" J1 and J2 1x3 pin holes (Ø1.22 nominal -> press-fit for
-            // sample 0.64 mm square pins).
-            for (ry = [j1_y, j2_y], dx = [-2.54, 0, 2.54])
-                translate([dx, ry, -0.5])
+            // "stacked" J1 and J2 1x3 pin holes at (j1_x, j1_y) and (j2_x, j2_y).
+            for (p = [[j1_x, j1_y], [j2_x, j2_y]], dx = [-2.54, 0, 2.54])
+                translate([p[0] + dx, p[1], -0.5])
                     cylinder(d = 1.22, h = pcb_t + 1);
             // South (-Y) orientation notch + "v0.3" label on top face.
             translate([0, -pcb_d / 2, -0.5])
