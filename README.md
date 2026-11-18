@@ -207,7 +207,8 @@ We obviously want to modernize this with an LED.
   outputs are fixed at 16.5 mA per channel (datasheet typical), about 80% of the
   2018 current. Pixel v0.1 measured about 15.4 mA per channel at 12 V, about 14.7 mA
   when warm (2026-11-17, `hardware/pixel/production/v0.1/MANIFEST.md`).
-  **TBD:** confirm this is bright enough.
+  Confirmed bright enough inside a real house (2026-11-18). Even 50% PWM was still
+  acceptable, though less vibrant.
 - As of 2026-09-30, the original SOP-12 WS2814 (C965562) shows 0 stock at LCSC.
   The draft schematic uses the WS2814F (FSOP-8, C5446694, about 107,000 in stock).
   It has the same 16.5 mA outputs, the same 9 V DIN rating, and the same 12 V
@@ -305,12 +306,20 @@ first-class requirement here.
     DIN inside that window in both the reversed and offset cases. A series
     resistor alone would not.
   - DOUT keeps the datasheet's 100 ohm series resistor.
-  - **TBD:** the R2 value. Test on the first fabricated Pixel boards (the LED
-    samples on order don't include a WS2814F):
-    - Reversed plug: check that the upstream DOUT and the Dig-Quad output survive
-      and still work afterward.
-    - Offset plug: measure VDD with 12 V on DATA_IN. It must stay at or below 5.3 V.
-    No circuit change is planned until those results are in.
+  - **R2 = 4.7k (C25900) from Pixel v0.2**, decided 2026-11-18 from the v0.1 tests
+    (`hardware/pixel/production/v0.1/MANIFEST.md`):
+    - Offset plug, with 12 V on DATA_IN: R2 = 1k let VDD reach 6.13 V, which
+      **fails**. The board survived. VDD stays flat until about 5-6 mA flows into
+      the VDD node, then climbs steeply: 2k measured 5.343 V and 11k measured
+      5.243 V. 4.7k gives about 5.27 V *(est., interpolated)*.
+    - Data still decoded cleanly with 11k in front of DIN. DIN's input capacitance
+      is at most 15 pF (datasheet p.3), so 4.7k gives an edge of about 70 ns.
+    - Reversed plug, one board: 1.74 mA into the upstream DOUT, which **passes**.
+      Both boards survived. A reversed house carrying 5 more downstream (about
+      16 mA *(est.)*) is untested.
+    - The datasheet's VDD limits disagree with each other. "Maximum ratings"
+      gives 3.7 - 5.3 V (p.2), while the characteristics are specified at
+      4.5 - 5.5 V (p.3). This project keeps 5.3 V as the limit.
 - Flat servo cable fits the original cord channel. It is thinner than the classic
   120 V lamp cord that already uses it.
 
@@ -384,8 +393,18 @@ first-class requirement here.
     out: at v0.1's spacing they don't fit side by side, and a right-angle female
     socket can't take the male plug where the board is under it (see "Servo
     plugs and cable" under Physical constraints).
-  - **TBD:** JLCPCB-assemblable vertical headers for v0.2: a male 1x3, and a
-    standard 8.5 mm female 1x3.
+  - Chosen for v0.2 (2026-11-17), a mating XFCN pair. Both are JLCPCB extended
+    parts, and both match `hardware/holder/params.scad`:
+    - J1, male: XFCN PZ254V-11-03P (C2937625). The body is 7.62 x 2.50 mm, the
+      pins are 0.64 mm square with 6.1 mm above the body, and the tail is 3.0 mm.
+      LCSC had 907,680 in stock.
+    - J2, female: XFCN PM254V-11-03-H85 (C541850). The body is 8.12 (±0.40) x
+      8.50 mm and the tail is 3.2 mm. LCSC had 37,990 in stock.
+      Alternative: HCTL PM254-1-03-Z-8.5 (C2897366), the vertical version of
+      v0.1's J2.
+    - KiCad's stock `PinHeader_1x03_P2.54mm_Vertical` and
+      `PinSocket_1x03_P2.54mm_Vertical` footprints fit both (1.0 mm drill).
+    - **TBD:** check samples in the coupon v0.3 mock disk.
 - Provisional layout (placed and routed, pending real plug dimensions):
   `hardware/pixel/pixel.kicad_pcb`.
   - The board is a 20 mm circle. The cord notch is taken to be at the south
@@ -462,6 +481,28 @@ first-class requirement here.
     (for example 4 x 4) with Standard two-sided assembly, or move the headers so
     that single-sided assembly covers them. Hand soldering MUST be kept to a
     minimum.
+  - Asked JLCPCB support on 2026-11-17 three things. First, whether Economic
+    assembly can solder through-hole headers whose bodies are on the bottom, with
+    their pins soldered on the top among the SMT parts. Second, if not, whether
+    they will hand- or selective-solder them on a Standard-assembly panel of at
+    least 70 mm. Third, what clearance they need between those pins and the
+    top-side SMT parts. JLCPCB support answered on 2026-11-17:
+    - Bottom-side header bodies make the board double-sided, so v0.2 needs
+      **Standard PCBA**. Economic is single-sided only.
+    - A customer panel of 4 x 4 boards with mouse bites, 5 mm rails and
+      fiducials is accepted. It meets the 70 x 70 mm minimum and is within the
+      250 x 250 mm maximum.
+    - The headers' joints are on the SMT side, so they are selective- or
+      hand-soldered, not wave-soldered. The price is $0.0164 per joint plus a
+      $3.58 hand-soldering labor fee per order. That is about $3.15 in joints for
+      32 boards (6 joints each).
+    - There is no published minimum clearance between through-hole pins and SMT
+      parts; JLCPCB checks it in DFM review after the order is uploaded. They
+      call 1 - 2 mm "tight for hand soldering". Low-profile parts are generally
+      workable, but taller parts may block the iron.
+    - Decided: v0.2 is ordered as a 4 x 4 panel with Standard assembly. Keep
+      parts near the pins low (0402/0603), and keep the 1.6 mm-tall LEDs as far
+      from the pins as the edge keep-out allows.
   - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
     after the silkscreen version. Each has the exact uploaded files and a
     `MANIFEST.md` with the source commit, file hashes, checks, and the order
