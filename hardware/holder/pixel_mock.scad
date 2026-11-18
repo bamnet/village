@@ -1,24 +1,30 @@
-// Mock-up of a Pixel PCB v0.1 fitted with vertical headers and both servo
-// plugs mated, for clearance checks only (not printed). Part outlines are the
-// KiCad courtyards from hardware/pixel/pixel.kicad_pcb, flipped into model
-// coordinates (Y = -KiCad Y), so the top side is always v0.1's even when
-// `layout` moves the headers. Plug and cable sizes are measured (params.scad).
+// Mock-up of a Pixel PCB v0.2 fitted with vertical headers and both servo
+// plugs mated, for clearance checks only (not printed). Part outlines come
+// from `hardware/pixel/pixel.kicad_pcb` (PR #17), flipped into holder model
+// coordinates (`Y = -KiCad_Y`). For the three 5x5 mm LEDs (D2-D4), both the
+// 5.0 x 5.0 x 1.6 mm package body and the low-profile pad/lead courtyard
+// (~0.35 mm) are modeled so 3D lip clearances match physical reality.
 
 include <params.scad>
 
-// [x0, y0, x1, y1, height] in KiCad coordinates relative to board center.
+// [x0, y0, x1, y1, height] in KiCad coordinates relative to board center (100, 100).
 top_parts = [
-    [-2.65, 3.55, 3.25, 9.05, led_h],   // D3
-    [-8.15, -1.15, -2.65, 4.75, led_h], // D4
-    [2.85, -2.35, 8.35, 3.55, led_h],   // D2
-    [-2.15, -3.30, 1.85, 0.50, 1.2],    // U1
-    [-1.93, -8.50, 1.93, -5.10, 1.1],   // D1
-    [-6.17, -7.03, -5.23, -5.17, 0.5],  // R2
-    [1.89, -3.19, 2.81, -1.37, 0.5],    // C1
-    [2.12, -6.93, 5.08, -5.47, 0.8],    // C2
-    [-5.08, -6.93, -2.12, -5.47, 0.6],  // R1
-    [1.43, 0.57, 2.37, 2.43, 0.5],      // R3
-    [-4.03, -3.07, -2.17, -2.13, 0.5],  // R4
+    // 5.0 x 5.0 x 1.6 mm LED bodies (F.Fab) + 0.35 mm pad/lead envelopes (F.CrtYd)
+    [-2.50, -8.90,  2.50, -3.90, led_h], // D2 (north) body, r_max 9.24
+    [-2.95, -9.15,  2.95, -3.65, 0.35],  // D2 pads/leads
+    [ 3.90, -2.50,  8.90,  2.50, led_h], // D3 (east) body, r_max 9.24
+    [ 3.65, -2.95,  9.15,  2.95, 0.35],  // D3 pads/leads
+    [-2.50,  4.25,  2.50,  9.25, led_h], // D4 (south) body, r_max 9.58 (in open mouth)
+    [-2.95,  4.00,  2.95,  9.50, 0.35],  // D4 pads/leads
+    // Remaining SMT parts (full KiCad F.CrtYd courtyards)
+    [-9.03, -2.00, -5.23,  2.00, 1.2],   // U1 (WS2814F)
+    [-6.40, -7.03, -3.00, -3.17, 1.1],   // D1 (BAT54S)
+    [-7.28,  3.32, -4.32,  4.78, 0.6],   // R1 (2.7k)
+    [-7.37, -5.93, -6.43, -4.07, 0.5],   // R2 (4.7k)
+    [-7.13, -2.97, -5.27, -2.03, 0.5],   // R3 (100)
+    [-4.88,  7.13, -3.02,  8.07, 0.5],   // R4 (120)
+    [-8.16, -4.01, -7.24, -2.19, 0.5],   // C1 (100n)
+    [-6.48,  5.17, -3.52,  6.63, 0.8],   // C2 (1u 50V)
 ];
 
 module kicad_box(b, z0) {
@@ -49,8 +55,7 @@ module j1_plug() {
     color("dimgray") hanging_box(j1_x, j1_y, pf_w, pf_t, pcb_bot - j1_body_h, pf_l);
 }
 
-// Male plug's sleeve over J2's socket. The neck's width is not measured, so it
-// is drawn as wide as the sleeve.
+// Male plug's sleeve over J2's socket.
 module j2_plug() {
     j2_mouth = pcb_bot - max(0, j2_body_h - pm_engage);
     color("dimgray") {
@@ -60,7 +65,7 @@ module j2_plug() {
 }
 
 // Cables: straight down out of each plug, then bent outward under the flange
-// toward 270 degrees.
+// toward 270 degrees (-Y).
 module mock_cables() {
     color("red") for (p = [[j1_x, j1_y, j1_stack], [j2_x, j2_y, j2_stack]]) {
         z_end = pcb_bot - p[2];
