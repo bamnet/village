@@ -28,7 +28,8 @@ hashes. Once it's ordered, these files never change.
   1. Konnect `export_manufacturing_package` on the single board: `fab_house`
      jlcpcb, BOM fields `Value,Reference,Footprint,LCSC`, and
      `jlcpcb_cpl_corrections_path` `../../jlcpcb_cpl_corrections.json`
-     (U1 +270, D1 +180, the same policy as v0.1).
+     (policy v2: U1 +270 and D1 +180 as on v0.1, plus +90 for both vertical
+     headers, added after JLCPCB's bottom-side preview showed them turned 90°).
   2. `../../panel/panel_assembly.py` expands that to the 16 panel copies
      (designators `<ref>_<n>`, n = 0 - 15) and shifts the coordinates to the
      panel's aux origin, which is the gerbers' origin.
@@ -82,7 +83,7 @@ hashes. Once it's ordered, these files never change.
 |---|---|---|
 | `pixel-panel-gerbers.zip` (contents of `gerbers/`) | PCB order | `a486e723d9e60a509c145769d369a04c8cb5c612afdb2acf230cf7c76c73b44c` |
 | `BOM-pixel-panel.csv` | Assembly: BOM | `bbf5931823b1533d5a3b967859ccac7c07e3f83913aa8aa059999e2e15c7a5c5` |
-| `CPL-pixel-panel.csv` | Assembly: CPL | `231d5f4308334a8ad34cbabd3643ba5b1cd356d70f2fe946ddb7de11ab804a97` |
+| `CPL-pixel-panel.csv` | Assembly: CPL | `235c61ea1fb8f0f733d1cd878185f84b42e3e377bb02417bc7a5d5516bfd305b` |
 
 ## Order settings to use
 
