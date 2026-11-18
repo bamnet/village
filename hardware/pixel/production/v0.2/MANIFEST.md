@@ -1,9 +1,8 @@
 # Pixel PCB v0.2: JLCPCB panel package
 
-Status: **ready to order, not ordered yet.** The holder team reviewed it in
-PR #17 (2026-11-18), and the holder itself is iterated separately (PR #18). If
-the design changes before ordering, regenerate everything here and update the
-hashes. Once it's ordered, these files never change.
+Status: **ordered 2026-11-18** (tag `pixel-v0.2`). Do not change these files.
+A design change gets a new silkscreen version and a new folder. The holder team
+reviewed it in PR #17. The holder itself is iterated separately (PR #18).
 
 ## Source
 
@@ -109,4 +108,43 @@ hashes. Once it's ordered, these files never change.
 
 ## Order
 
-Not ordered yet.
+- Date: 2026-11-18
+- JLCPCB order numbers: PCB `Y13-3347415A`, assembly `SMT026111860837`.
+  Both were "Reviewing" at the time of writing.
+- **PCB as ordered:**
+  - **5 panels** (JLCPCB's minimum), 100 x 115 mm, FR-4 TG135, 2 layers,
+    1.6 mm, 1 oz.
+  - **White** mask, black ink-jet silkscreen.
+  - **HASL with lead.** The plan said LeadFree; this differs from v0.1.
+  - Tented vias, min via 0.3 mm, flying-probe full test, ±0.2 mm outline,
+    IPC Class 2, Remove Mark.
+  - Delivery format "Single PCB", 1 design. The uploaded gerber *is* the
+    4 x 4 panel, so if JLCPCB's review asks, it's a customer panel: 4 x 4
+    copies of one design.
+- **Assembly as ordered:**
+  - **2 of the 5 panels** (32 boards), Standard PCBA, both sides.
+  - Confirm Parts Placement. Build time 4 - 5 days.
+  - The other 3 panels (48 boards) arrive bare.
+- **Placement preview:**
+  - Top: U1 pin 1, D1, and the D2 - D4 pin-2 corner marks all matched the board.
+  - Bottom: the first upload showed both header models turned 90°. The
+    correction policy got a +90 rule (v2), the CPL was regenerated and
+    re-uploaded (PR #19), and the re-check showed both headers east-west
+    inside their outlines. The CPL hash above is the re-uploaded file.
+- **Cost:**
+  - PCB: $9.60.
+  - Assembly: $114.33.
+    - Setup $51.50
+    - Stencil $8.27
+    - Components $13.30
+    - Extended-part fees $13.95
+    - SMT $2.84
+    - Hand soldering $3.61
+    - Manual assembly $3.37
+    - Assembly fixture $16.54
+    - Packaging $0.50
+    - Confirm Parts Placement $0.45
+  - Merchandise $123.93, shipping $42.01, duties and taxes $34.71, disbursement
+    fee $4.44, discount −$24.79, sales tax $9.35.
+  - **Total: $189.65**, about $5.93 per assembled board.
+- DFM review: pending.
