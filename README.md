@@ -405,82 +405,63 @@ first-class requirement here.
     - KiCad's stock `PinHeader_1x03_P2.54mm_Vertical` and
       `PinSocket_1x03_P2.54mm_Vertical` footprints fit both (1.0 mm drill).
     - **TBD:** check samples in the coupon v0.3 mock disk.
-- Provisional layout (placed and routed, pending real plug dimensions):
-  `hardware/pixel/pixel.kicad_pcb`.
-  - The board is a 20 mm circle. The cord notch is taken to be at the south
-    (+Y) edge.
-  - J1 and J2 are on the bottom side, with pin rows side by side about 4 mm north
-    of center. Their bodies point south and run under the board, so the plugs
-    mate near the south rim and lie flat. This works because the headers and
-    plugs are on the bottom while every other part is on the top, so the header
-    bodies can sit under the top-side parts.
-  - This relaxes "headers near the rim". The pin rows sit just north of the
-    LEDs, and the LED cluster sits about 2.5 mm south of center.
-  - The header rows are 8.9 mm apart, center to center. KiCad's stock
-    footprints need at least 8.62 mm. The real plugs need at least 9.2 mm, so
-    both cables can't be plugged in at once (measured 2026-11-14).
-  - J1 and J2 use KiCad's stock right-angle footprints. Checked against the LCSC
-    drawings on 2026-09-30, and the copper matches:
-    - J1, male (XFCN PZ254R-11-03P, C492411): Ø1.02 mm holes and 0.64 mm square
-      pins (0.91 mm across the corners, so they fit the 1.0 mm drill). The
-      body's front face is 4.4 mm from the pin row, and the pin tips are at
-      10.4 mm (KiCad draws 4.04 mm and 10.04 mm).
-    - J2, female (HCTL PM254-1-03-W-8.5, C2897385): Ø1.02 mm holes. The 8.5 mm
-      body ends 10.2 mm from the pin row (KiCad draws 10.03 mm), and the body is
-      8.02 mm wide (KiCad draws 7.62 mm). A purchased sample measured about
-      8.09 mm wide (2026-11).
-    - KiCad's courtyards still cover both real bodies. With the rows 8.9 mm apart,
-      the bodies are about 1.1 mm apart.
-    - The pin tails are 3.0 and 3.2 mm long, so on a 1.6 mm board they stick up
-      about 1.4 - 1.6 mm on the LED side.
-  - Pin order: the stock footprints put J1's pin 1 at the west end and J2's pin 1
-    at the east end, so the two GND pins are adjacent. Neither part is polarized,
-    so this only decides which way up each cable plugs in.
-  - Silkscreen markings for plugging in and for JLCPCB's assembly review:
-    - Bottom: a filled triangle points at each header's pin 1 (data), with "+" and
-      "-" at the other pins. These shapes read the same whether or not they are
-      mirrored.
-    - Bottom: "JLCJLCJLCJLC" marks where JLCPCB should print its order number.
-      The 2026-11 order form had no "Specify a location" option, so v0.1 was
-      ordered with "Mark on PCB: Remove Mark" instead.
-    - Top: "v0.1", and a pin-1 dot inside U1's outline. The footprint's pin-1
-      silkscreen line is clipped by J1's GND pad, so without the dot the top and
-      bottom lines would look alike.
-    - The LEDs keep their pin-1 tick. D1 uses KiCad's stock SOT-23 outline.
-  - On the top side, the LEDs follow the chain +12V -> D2 (east, rot 90) -> D3
-    (south, rot 0) -> D4 (west, rot 270) -> U1. Each LED faces the side that
-    connects to the next LED toward it, so each group of four color nets between
-    LEDs fans diagonally with no crossings. D4's R/G/B cathodes sit just below
-    U1's matching outputs. U1 is between D4 and D2, with R4 on the red output and
-    C1 beside the VDD pin. D1, R1, C2 and R2 sit above the header pin rows.
-  - Routed with Freerouting 2.4.1: 4 vias. +12V and GND are 0.4 mm (a Power
-    netclass), because up to ~0.4 A passes through to the rest of the chain.
-    Signals are 0.2 mm. VDD narrows to 0.15 mm around U1, and the board minimum
-    is set to 0.15 mm to allow it.
-  - DRC: 0 errors, 0 unconnected. JLCPCB's limits are enforced by
+- Layout: `hardware/pixel/pixel.kicad_pcb`. **v0.2 was ordered 2026-11-18**; see
+  `hardware/pixel/production/v0.2/MANIFEST.md` (tag `pixel-v0.2`). v0.1's layout
+  (right-angle headers side by side, near the rim) is in tag `pixel-v0.1`.
+  - The board is a 20 mm circle, with south (+Y in KiCad) toward the cord notch.
+  - J1 and J2 are vertical, on the bottom, in two east-west rows. The whole
+    stack is offset dx −1.20 mm, dy −0.45 mm (holder frame) so the three LEDs
+    clear the pins. Relative to the board center, J1's pins are at y −1.650
+    (KiCad) and J2's at y +1.975, both at x −3.74 / −1.20 / +1.34. J1 has
+    DATA_IN on its west end and J2 has DATA_OUT on its east end, with +12 V in
+    the middle and GND on the other end. The holder team verified this (PR #17)
+    and the holder matches it (PR #18).
+  - The pin tails come up through the middle of the top side. The LEDs sit
+    north (D2), east (D3) and south (D4), 1.40 / 1.71 / 1.43 mm from the header
+    pads. That leaves the LED cluster about 2.1 mm east of center, which was
+    accepted. U1 and the passives are on the west side; U1 is 0.64 mm from the
+    pads. Every top-side part is inside r 9.25 mm except D4, which reaches r 9.58
+    in the holder's open south mouth.
+  - The LEDs follow the chain +12V → D2 → D3 → D4 → U1, so each LED-to-LED link
+    is four parallel diagonals.
+  - Silkscreen:
+    - Top: "v0.2" and a south-pointing arrow between the header rows.
+    - Bottom: a triangle at each header's signal pin, beside the "J1"/"J2" labels.
+    - No order-number text, because JLCPCB doesn't print one on our orders.
+  - Routed with Freerouting 2.4.1 (13 vias). +12V and GND use the 0.4 mm Power
+    netclass, signals are 0.2 mm, and VDD goes down to 0.15 mm near U1. DRC:
+    0 errors, 0 warnings, 0 unconnected. JLCPCB's limits are enforced by
     `pixel.kicad_dru` and the board setup.
-  - Routing workflow: export the DSN with KiCad's Python module
-    (`pcbnew.ExportSpecctraDSN`). Route with Freerouting's bundled launcher,
-    because the standalone jar needs Java 25. Import the session in KiCad with
-    File -> Import -> Specctra Session. Konnect's own DSN export refuses this
-    board (round outline, back-side headers, custom rules).
-  - JLCPCB export: Konnect's `export_manufacturing_package` with the board open in
-    KiCad, `fab_house` jlcpcb, all copper/paste/silkscreen/mask layers plus
-    Edge.Cuts, BOM fields `Value,Reference,Footprint,LCSC`, and
-    `jlcpcb_cpl_corrections_path` set to `jlcpcb_cpl_corrections.json`. That file
-    rotates U1 by 270 degrees and D1 by 180 degrees in the CPL. Both values came
-    from comparing our footprints with JLCPCB's EasyEDA footprints for the BOM parts.
-    The same comparison reproduces Konnect's preview-verified SOIC-8 rule. The LEDs
-    need no correction. JLCPCB's placement preview for v0.1 confirmed U1, D1 and
-    the LEDs.
+  - Routing workflow:
+    1. Export the DSN with `pcbnew.ExportSpecctraDSN`, or the GUI's
+       File → Export → Specctra DSN.
+    2. Run Freerouting headless:
+       `freerouting -de pixel.dsn -do pixel.ses -mp 100`.
+    3. In KiCad, File → Import → Specctra Session.
+
+    Konnect's own DSN export refuses this board (round outline, back-side
+    headers). KiCad's Python module needs the Ubuntu 26.04 build of KiCad;
+    the 24.04 build crashes on `LoadBoard`.
+  - JLCPCB export: v0.2 is a KiKit 4 x 4 panel, rebuilt with
+    `hardware/pixel/panel/build_production.sh` from Konnect's single-board
+    `export_manufacturing_package`. The Konnect export uses `fab_house` jlcpcb,
+    BOM fields `Value,Reference,Footprint,LCSC` and `jlcpcb_cpl_corrections.json`.
+    That correction file applies these CPL rotations, checked in JLCPCB's
+    placement preview:
+    - U1 +270
+    - D1 +180
+    - both vertical headers +90 (added for v0.2)
+    - the LEDs: none
+
+    `panel/panel_assembly.py` expands the single-board BOM/CPL to the panel.
+    KiKit's own assembly output was unusable here.
   - JLCPCB's Economic assembly is single-sided, so it leaves off the bottom-side
     headers J1 and J2. Standard assembly can do both sides but needs a board of at
     least 70 mm. v0.1 (5 boards) was assembled top side only, with J1/J2
     hand-soldered.
-  - **TBD:** for the 22-board run, either order a JLCPCB panel of at least 70 mm
-    (for example 4 x 4) with Standard two-sided assembly, or move the headers so
-    that single-sided assembly covers them. Hand soldering MUST be kept to a
-    minimum.
+  - For the 22-board run: decided on a JLCPCB 4 x 4 panel with Standard two-sided
+    assembly. v0.2 was ordered that way: 5 bare panels, 2 of them assembled.
+    Hand soldering MUST be kept to a minimum.
   - Asked JLCPCB support on 2026-11-17 three things. First, whether Economic
     assembly can solder through-hole headers whose bodies are on the bottom, with
     their pins soldered on the top among the SMT parts. Second, if not, whether
