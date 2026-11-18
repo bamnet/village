@@ -126,10 +126,81 @@ part is calculated, not measured.
   allows 1.5 V of cable drop from 12 V.
 - Blue was not swept, because blue is not a primary color for this project.
 
+### Brightness (inside a real house, by eye, 2026-11-18)
+
+- `w` at v255: definitely bright enough.
+- v128: still bright enough, but less vibrant.
+- v64: noticeably dimmer.
+- The step from v255 to v128 looked much smaller than the step from v128 to v64,
+  which is expected, since the eye responds roughly logarithmically.
+- The sketch sends raw PWM duty (no gamma), so v128 is about 50% of full output.
+- v170 (about what 2 LEDs would give at full) looked dimmer than v255. Decision: keep
+  3 LEDs unless that becomes a blocker later.
+
+### Protection: offset plug, 12 V on DATA_IN (2026-11-18)
+
+Supply 12.0 V, OCP 100 mA (the supply won't go lower). No Arduino. DATA_IN was
+jumpered to +12 V for about 1 minute.
+
+| | Supply current | VDD at R1 (meter) |
+|---|---|---|
+| Baseline | 2.48 mA | 2.35 V (*suspect, see below*) |
+| DATA_IN on +12 V | 7.70 mA | **6.12 V** |
+
+- **Fail: VDD of 6.12 V is above the 5.3 V absolute maximum.** The board survived:
+  nothing got hot, and `w` still worked afterward.
+- The first baseline reading (2.35 V at R1) was a probe error. Re-measured at C1:
+  **baseline 5.239 V; with DATA_IN on +12 V, VDD 6.132 V** and DIN 6.139 V.
+  - DIN reading only 7 mV above VDD is unexplained. A BAT54S at about 5 mA should
+    drop about 0.3 V, so the DIN probe may have landed on the VDD net.
+- Datasheet (WS2814F V1.1, LCSC C5446694):
+  - p.2 "maximum ratings" lists VDD +3.7 to +5.3 V.
+  - p.3 specifies the electrical characteristics at VDD 4.5 - 5.5 V.
+  - p.1: VDD has a built-in zener, fed through a series resistor.
+  - p.5 application circuits: 2.7k at 12 V and 8.2k at 24 V, which is about
+    2.3 - 2.5 mA of zener current *(est.)*. This fault pushed about 7.7 mA into
+    the VDD node.
+  - p.3: DIN input capacitance is at most 15 pF.
+- R2 sizing: an external resistor in series with the on-board 1k R2, 12 V on
+  DATA_IN, VDD at C1:
+
+  | Total R in front of DIN | VDD | Current into the VDD node *(est.)* |
+  |---|---|---|
+  | none, DATA_IN open (baseline) | 5.239 V | 2.5 mA |
+  | 1k (R2 only) | 6.126 V | 7.7 mA |
+  | 2k (+1k) | 5.343 V | 5.7 mA |
+  | 11k (+10k) | 5.243 V | 3.1 mA |
+
+  VDD stays fairly flat up to about 5.7 mA, then climbs steeply. Interpolating
+  between the 2k and 11k points gives about 5.27 V for **R2 = 4.7k** *(est.)*,
+  which is inside the 5.3 V limit.
+- Data check: with a 10k in series at DATA_IN (11k in front of DIN, the worst
+  case), `w`, `r`, `g`, `b`, `a` and `c` all displayed correctly with no glitches.
+  So 4.7k leaves plenty of timing margin.
+- The 6.12 V reading does match the current *(est.)*. R1 carries about
+  (12 − 6.12) / 2.7k = 2.2 mA, so R2 carries about 5.5 mA. That puts DIN at about
+  6.5 V, one Schottky drop (about 0.36 V) above VDD. So the reading is believable.
+
+### Protection: reversed plug (2026-11-18)
+
+Board A powered normally from a 12.0 V supply (100 mA OCP) and driven by the
+Arduino. Board B connected to A's J2 with its J1 reversed: B's GND to A's
+DATA_OUT, B's DATA_IN to A's GND, +12 V straight. Meter in series between A's J2
+pin 1 and B's J1 pin 3.
+
+- Current into A's DATA_OUT: **1.74 mA** (README estimate about 2.6 mA, against
+  DOUT's 10 mA minimum sink rating). **Pass.**
+- The rest of B's roughly 2.5 mA supply current *(est.)* returns through B's D1
+  and R2 into A's GND. The README predicted that split.
+- Afterward, A and B both worked normally, alone and chained correctly.
+- With R2 at 4.7k, less current takes the R2 path, so the DOUT current should rise
+  toward about 2.5 mA *(est.)*. That's still well under 10 mA.
+- Only one reversed board was tested. The README's worst case (one reversed house
+  carrying 5 more downstream, about 16 mA) is still untested.
+
 ### Not yet tested
 
-- Brightness against the 2018 segment and inside a real house.
+- Brightness side by side with the 2018 segment. It's no longer needed, since the
+  in-house test passed.
 - A 5-board chain, and a run of about 2 m to the first board.
-- Protection: 12 V on DATA_IN (VDD must stay at or below 5.3 V, and VDD idles at
-  5.235 V) and the reversed plug. These decide R2.
 - Boards 3 - 5: not yet inspected or powered.

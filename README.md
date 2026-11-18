@@ -207,7 +207,8 @@ We obviously want to modernize this with an LED.
   outputs are fixed at 16.5 mA per channel (datasheet typical), about 80% of the
   2018 current. Pixel v0.1 measured about 15.4 mA per channel at 12 V, about 14.7 mA
   when warm (2026-11-17, `hardware/pixel/production/v0.1/MANIFEST.md`).
-  **TBD:** confirm this is bright enough.
+  Confirmed bright enough inside a real house (2026-11-18). Even 50% PWM was still
+  acceptable, though less vibrant.
 - As of 2026-09-30, the original SOP-12 WS2814 (C965562) shows 0 stock at LCSC.
   The draft schematic uses the WS2814F (FSOP-8, C5446694, about 107,000 in stock).
   It has the same 16.5 mA outputs, the same 9 V DIN rating, and the same 12 V
@@ -305,12 +306,20 @@ first-class requirement here.
     DIN inside that window in both the reversed and offset cases. A series
     resistor alone would not.
   - DOUT keeps the datasheet's 100 ohm series resistor.
-  - **TBD:** the R2 value. Test on the first fabricated Pixel boards (the LED
-    samples on order don't include a WS2814F):
-    - Reversed plug: check that the upstream DOUT and the Dig-Quad output survive
-      and still work afterward.
-    - Offset plug: measure VDD with 12 V on DATA_IN. It must stay at or below 5.3 V.
-    No circuit change is planned until those results are in.
+  - **R2 = 4.7k (C25900) from Pixel v0.2**, decided 2026-11-18 from the v0.1 tests
+    (`hardware/pixel/production/v0.1/MANIFEST.md`):
+    - Offset plug, with 12 V on DATA_IN: R2 = 1k let VDD reach 6.13 V, which
+      **fails**. The board survived. VDD stays flat until about 5-6 mA flows into
+      the VDD node, then climbs steeply: 2k measured 5.343 V and 11k measured
+      5.243 V. 4.7k gives about 5.27 V *(est., interpolated)*.
+    - Data still decoded cleanly with 11k in front of DIN. DIN's input capacitance
+      is at most 15 pF (datasheet p.3), so 4.7k gives an edge of about 70 ns.
+    - Reversed plug, one board: 1.74 mA into the upstream DOUT, which **passes**.
+      Both boards survived. A reversed house carrying 5 more downstream (about
+      16 mA *(est.)*) is untested.
+    - The datasheet's VDD limits disagree with each other. "Maximum ratings"
+      gives 3.7 - 5.3 V (p.2), while the characteristics are specified at
+      4.5 - 5.5 V (p.3). This project keeps 5.3 V as the limit.
 - Flat servo cable fits the original cord channel. It is thinner than the classic
   120 V lamp cord that already uses it.
 
