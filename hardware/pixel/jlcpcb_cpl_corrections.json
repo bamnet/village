@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "policy_id": "village-pixel-jlcpcb-cpl-v1",
-  "provenance": "2026-11-07: each KiCad footprint compared with JLCPCB's EasyEDA footprint for the BOM part (C5446694 WS2814F, C19726 BAT54S) by matching pad numbers. The method reproduces Konnect's preview-verified SOIC-8 +270 rule (C7593, C7950). The HL-5050RGBW LEDs (C22470444) need no correction. Confirm in JLCPCB Component Placements.",
+  "policy_id": "village-pixel-jlcpcb-cpl-v2",
+  "provenance": "2026-11-07: each KiCad footprint compared with JLCPCB's EasyEDA footprint for the BOM part (C5446694 WS2814F, C19726 BAT54S) by matching pad numbers. The method reproduces Konnect's preview-verified SOIC-8 +270 rule (C7593, C7950). The HL-5050RGBW LEDs (C22470444) need no correction. Confirm in JLCPCB Component Placements. 2026-11-18 (v0.2 order): JLCPCB's bottom-side preview showed both vertical 1x3 header models (C2937625, C541850) turned 90 degrees from their hole rows; added +90 for both. The headers are symmetric end to end, so +90 or -90 both fit.",
   "footprint_rules": [
     {
       "id": "village-fsop-8-ws2814f",
@@ -12,6 +12,16 @@
       "id": "kicad-sot-23-bat54s",
       "footprint_prefix": "SOT-23",
       "rotation_degrees": 180
+    },
+    {
+      "id": "kicad-pinheader-1x03-vertical-c2937625",
+      "footprint_prefix": "PinHeader_1x03_P2.54mm_Vertical",
+      "rotation_degrees": 90
+    },
+    {
+      "id": "kicad-pinsocket-1x03-vertical-c541850",
+      "footprint_prefix": "PinSocket_1x03_P2.54mm_Vertical",
+      "rotation_degrees": 90
     }
   ],
   "component_overrides": []
