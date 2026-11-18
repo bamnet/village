@@ -1,8 +1,9 @@
 # Pixel PCB v0.2: JLCPCB panel package
 
-Status: **DRAFT, not ordered.** It waits on the holder team's review of PR #17.
-If the design changes before ordering, regenerate everything here and update
-the hashes. Once it's ordered, these files never change.
+Status: **ready to order, not ordered yet.** The holder team reviewed it in
+PR #17 (2026-11-18), and the holder itself is iterated separately (PR #18). If
+the design changes before ordering, regenerate everything here and update the
+hashes. Once it's ordered, these files never change.
 
 ## Source
 
