@@ -9,7 +9,9 @@
     "vbackbone": "0mm",
     "rotation": "0deg",
     "vbonecut": false,
-    "hbonecut": false
+    "hbonecut": false,
+    "renameref": "{orig}_{n}",
+    "renamenet": "Board_{n}-{orig}"
   },
   "tabs": {
     "type": "fixed",
