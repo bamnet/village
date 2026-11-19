@@ -484,6 +484,30 @@ first-class requirement here.
     - Decided: v0.2 is ordered as a 4 x 4 panel with Standard assembly. Keep
       parts near the pins low (0402/0603), and keep the 1.6 mm-tall LEDs as far
       from the pins as the edge keep-out allows.
+  - On 2026-11-19, JLCPCB's engineer emailed about the v0.2 assembly order
+    (`SMT026111860837`). They weren't sure the polarity was right and asked us to
+    confirm their "Corrected Part Placement" pictures. Checked against
+    `pixel.kicad_pcb`, all of them were correct:
+    - U1 pin 1: bottom-left.
+    - D1 pin 1: bottom-left.
+    - LED pin 2 corners: D2 bottom-right, D3 bottom-left, D4 top-left.
+    - J1/J2: east-west on the bottom.
+
+    We replied to proceed. The likely cause is that both custom footprints are
+    unknown to JLCPCB, and the LED's silkscreen polarity mark is only a 0.2 mm
+    tick at pin 2, not pin 1. To avoid the round trip next time:
+    - **Next revision:** make the silkscreen polarity marks bold. Put a filled
+      dot or triangle just outside each LED's body at the corner-mark (pin 2)
+      corner. Keep it at pin 2, as explained above. Add the same kind of mark
+      at U1 pin 1. Keep each mark clear of the pads so it stays visible after
+      placement.
+    - **Every order:** in the assembly remark field, write: "LEDs D2-D4
+      (C22470444): the marked corner is pin 2 (white cathode), as in the CPL.
+      U1 pin 1 = dot. Placement already verified in the preview." When
+      reordering the same files, also quote the earlier order number and say
+      its placement was confirmed.
+    - Keep "Confirm Parts Placement" ticked ($0.45). Reply to these emails
+      quickly, because the order is on hold until we do.
   - Manufacturing releases live in `hardware/pixel/production/<version>/`, named
     after the silkscreen version. Each has the exact uploaded files and a
     `MANIFEST.md` with the source commit, file hashes, checks, and the order
