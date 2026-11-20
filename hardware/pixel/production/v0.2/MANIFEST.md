@@ -147,4 +147,8 @@ reviewed it in PR #17. The holder itself is iterated separately (PR #18).
   - Merchandise $123.93, shipping $42.01, duties and taxes $34.71, disbursement
     fee $4.44, discount −$24.79, sales tax $9.35.
   - **Total: $189.65**, about $5.93 per assembled board.
-- DFM review: pending.
+- **Placement query (2026-11-19):** JLCPCB's engineer asked us to confirm
+  polarity in their "Corrected Part Placement" pictures. All parts were correct
+  (see the README's Pixel PCB section), and we told them to proceed.
+- **DFM review: approved 2026-11-20, no comments**, including on the
+  SMT-to-header-pin clearances listed above.
